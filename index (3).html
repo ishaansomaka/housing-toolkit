@@ -1,0 +1,762 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Atlanta Region Housing Pressure Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pine:#1d3a2f; --river:#2f6f8f; --amber:#b86e00; --ink:#16201b; --muted:#56615b;
+  --paper:#f6f7f4; --surface:#ffffff; --line:#d5dbd5; --rule:#1d3a2f; --tint:#e9efea; --amber-tint:#fbf2e3; --bar:#a9bbb1; --focus:#2f6f8f;
+  --heroBg:#1d3a2f; --heroText:#ffffff; --heroSub:#d3e6db; --heroLine:#4f7564; --heroAccent:#e7a43c;
+  --serif:"Source Serif 4","Source Serif Pro",Georgia,serif; --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]){
+  --pine:#9fd1b8; --river:#7fb8d6; --amber:#f0b35a; --ink:#e8ede9; --muted:#a7b3ac; --paper:#101713; --surface:#16201a; --line:#2c3a32; --rule:#9fd1b8; --tint:#1d2b23; --amber-tint:#2e2414; --bar:#4f6a5c; --focus:#7fb8d6; --heroBg:#0d2219; --heroLine:#3b5a4b;}}
+:root[data-theme="dark"]{
+  --pine:#9fd1b8; --river:#7fb8d6; --amber:#f0b35a; --ink:#e8ede9; --muted:#a7b3ac; --paper:#101713; --surface:#16201a; --line:#2c3a32; --rule:#9fd1b8; --tint:#1d2b23; --amber-tint:#2e2414; --bar:#4f6a5c; --focus:#7fb8d6; --heroBg:#0d2219; --heroLine:#3b5a4b;}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-text-size-adjust:100%;font-feature-settings:"kern"}
+.wrap{max-width:1120px;margin:0 auto;padding:0 28px}
+a{color:var(--river);text-underline-offset:2px}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.num{font-variant-numeric:tabular-nums lining-nums}
+
+/* header */
+header.site{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;background:var(--surface);border-bottom:1px solid var(--line)}
+header.site .wrap{display:flex;align-items:center;gap:28px;min-height:60px;flex-wrap:wrap}
+.brand{font-family:var(--serif);font-weight:600;color:var(--pine);font-size:18px;white-space:nowrap;line-height:1.15;text-decoration:none}
+.brand small{display:block;font-family:var(--sans);font-weight:400;font-size:12px;color:var(--muted);letter-spacing:.01em}
+nav.tabs{display:flex;gap:4px;overflow-x:auto;flex:1;scrollbar-width:none}
+nav.tabs a{padding:19px 10px 17px;color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--pine);border-bottom-color:var(--amber)}
+.langbtn{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:2px;border:1px solid var(--line);background:transparent;color:var(--pine);cursor:pointer;white-space:nowrap}
+.langbtn:hover{border-color:var(--pine)}
+.countybar{background:var(--tint);border-bottom:1px solid var(--line);font-size:14px}
+.countybar .wrap{display:flex;align-items:center;gap:10px;min-height:42px;flex-wrap:wrap}
+select,.field input,.field textarea{font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--line);border-radius:2px;background:var(--surface);color:var(--ink)}
+select:hover{border-color:var(--muted)}
+
+/* pages */
+.page{display:none;padding:48px 0 72px}
+.page.active{display:block}
+.phead{max-width:760px;margin:0 0 32px}
+h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-0.012em;font-optical-sizing:auto}
+h1{font-size:clamp(32px,4.6vw,52px);line-height:1.08;margin:0 0 20px}
+h2{font-size:clamp(26px,3vw,34px);line-height:1.15;margin:0 0 12px;color:var(--pine)}
+h3{font-size:17px;line-height:1.3;margin:0 0 8px;font-weight:600}
+.intro{color:var(--muted);max-width:66ch;margin:0;font-size:17px}
+.sec{margin-top:56px}
+.sec>h3{font-family:var(--serif);font-size:23px;font-weight:600;color:var(--pine);margin-bottom:6px}
+.sec>.intro{font-size:16px;margin-bottom:18px}
+
+/* hero band with live locator map */
+.hero{background:var(--heroBg);color:var(--heroText);box-shadow:0 0 0 100vmax var(--heroBg);clip-path:inset(0 -100vmax);padding:56px 0 52px;margin:-48px 0 0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:48px;align-items:center}
+.hero h1{max-width:15ch;color:#fff}
+.hero .inline-select{font:inherit;font-weight:600;color:#fff;background:transparent;border:none;border-bottom:3px solid var(--heroAccent);border-radius:0;padding:0 2px 0 0;cursor:pointer;appearance:none;-webkit-appearance:none;max-width:100%}
+.hero .inline-select option{color:#16201b;font-size:17px;font-family:var(--sans)}
+.hero .lede{font-size:18px;line-height:1.6;max-width:56ch;color:var(--heroSub);margin:0}
+.hero .by{margin:22px 0 0;font-size:13px;color:#a9c9b8;max-width:60ch}
+#heromap{width:100%;height:auto;display:block;max-height:400px}
+#heromap path{fill:transparent;stroke:var(--heroLine);stroke-width:1.2;cursor:pointer;transition:fill .2s}
+#heromap path:hover{fill:rgba(255,255,255,.07)}
+#heromap path.sel{fill:var(--heroAccent);stroke:var(--heroAccent)}
+#heromap text{fill:#b9d3c5;font-size:14px;font-family:var(--sans);pointer-events:none}
+#heromap text.sel{fill:#1d3a2f;font-weight:600}
+.herocap{font-size:12px;color:#8fb3a1;margin-top:8px;text-align:right}
+
+/* key figures */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line);margin-bottom:44px}
+.stat{padding:26px 22px 24px;border-left:1px solid var(--line)}
+.stat:first-child{border-left:none;padding-left:0}
+.stat .v{font-family:var(--serif);font-size:38px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums lining-nums;color:var(--pine)}
+.stat .l{font-size:14px;color:var(--muted);margin-top:8px;line-height:1.4}
+
+.finding{border-left:3px solid var(--amber);padding:2px 0 2px 24px;margin:0 0 48px;max-width:76ch}
+.finding h3{font-family:var(--serif);font-size:22px;color:var(--ink);margin-bottom:8px}
+.finding p{margin:0;font-size:17px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:48px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:2px solid var(--rule)}
+.entry{padding:22px 24px 24px 0;margin-right:24px;border-bottom:1px solid var(--line)}
+.grid3 .entry{padding:22px 24px 4px 0;border-bottom:none}
+.grid3 .entry+.entry{padding-left:24px;border-left:1px solid var(--line);margin-right:0}
+.entry h3{font-family:var(--serif);font-size:20px;color:var(--pine)}
+.entry p{margin:0 0 6px;color:var(--muted);font-size:15px}
+.linkbtn{display:inline-block;margin-top:8px;font-weight:600;font-size:15px;color:var(--river);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px}
+.linkbtn:hover{color:var(--pine)}
+.steps{padding-left:0;margin:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px 1fr;gap:8px;padding:10px 0;border-top:1px solid var(--line)}
+.steps li::before{content:counter(s);font-family:var(--serif);font-weight:600;color:var(--amber);font-size:18px;line-height:1.4}
+
+/* signal register (regional) */
+.sigrank{display:grid;grid-template-columns:1fr 1fr;column-gap:48px;border-top:2px solid var(--rule)}
+.srow{font:inherit;display:grid;grid-template-columns:120px 1fr 56px;align-items:center;gap:14px;padding:11px 8px 11px 0;border:none;border-bottom:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer;text-align:left;width:100%}
+.srow:hover .nm{color:var(--river)}
+.srow.me{background:var(--amber-tint);padding-left:10px;margin-left:-10px;width:calc(100% + 10px)}
+.srow .nm{font-weight:600}
+.srow .dots{display:flex;gap:3px}
+.srow .dots i{width:16px;height:10px;background:var(--line)}
+.srow .dots i.on{background:var(--amber)}
+.srow .ct{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
+
+/* profile signals */
+.summary{font-family:var(--serif);font-size:21px;line-height:1.45;margin:0 0 20px;max-width:62ch}
+.signals{list-style:none;margin:0;padding:0;border-top:2px solid var(--rule)}
+.signal{display:grid;grid-template-columns:18px minmax(0,220px) 1fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.signal .mark{width:12px;height:12px;border:1.5px solid var(--muted);align-self:center}
+.signal.on .mark{background:var(--amber);border-color:var(--amber)}
+.signal .t{font-weight:600}
+.signal.on .t{color:var(--amber)}
+.signal:not(.on) .t{color:var(--muted);font-weight:500}
+.signal .d{color:var(--muted);font-size:15px}
+.note{font-size:14px;color:var(--muted);border-top:1px solid var(--line);padding:12px 0 0;margin-top:22px;max-width:76ch}
+
+/* indicators */
+.ind{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:36px;padding:26px 0;border-top:1px solid var(--line)}
+.ind h3{font-family:var(--serif);font-size:20px}
+.ind .what{color:var(--muted);font-size:15px;margin:0}
+.ind .why{font-size:15px;margin:8px 0 0}
+.nums{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.nums .now{font-family:var(--serif);font-size:32px;font-weight:600;font-variant-numeric:tabular-nums lining-nums;color:var(--pine)}
+.nums .was{color:var(--muted);font-variant-numeric:tabular-nums;font-size:15px}
+.badge{display:inline-block;font-size:12px;font-weight:600;padding:2px 8px;border:1px solid var(--pine);color:var(--pine)}
+.badge.noise{border-style:dashed;border-color:var(--muted);color:var(--muted);font-weight:500}
+.dumb{width:100%;height:auto;display:block;margin-top:10px}
+.legend{font-size:13px;color:var(--muted);display:flex;gap:18px;flex-wrap:wrap;margin-top:4px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.costrow{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--rule);border-bottom:1px solid var(--line);margin:0 0 8px}
+.costrow .stat{padding:20px 20px 18px}
+.costrow .stat .v{font-size:30px}
+
+/* maps */
+.mapwrap{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,1fr);gap:40px;align-items:start}
+.ctl{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.ctl label,.ctl .lbl{font-size:14px;color:var(--muted)}
+.seg{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);background:var(--surface)}
+.seg button{font:inherit;font-size:14px;padding:8px 14px;border:none;border-right:1px solid var(--line);background:transparent;color:var(--ink);cursor:pointer}
+.seg button:last-child{border-right:none}
+.seg button:hover{background:var(--tint)}
+.seg button[aria-pressed="true"]{background:var(--pine);color:var(--paper)}
+.choro{width:100%;height:auto;display:block}
+.choro path{stroke:var(--paper);stroke-width:1.2;cursor:pointer}
+.choro path.sel{stroke:var(--ink);stroke-width:2.5}
+.choro path:focus{outline:none;stroke:var(--focus);stroke-width:3}
+.choro text{pointer-events:none;font-family:var(--sans);font-size:11.5px;font-weight:600;paint-order:stroke;stroke:var(--paper);stroke-width:3px;stroke-linejoin:round}
+.choro text .v{font-weight:400;font-size:11px}
+.keybar{display:flex;align-items:flex-start;gap:0;margin-top:14px;font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.keybar .sw{display:flex;flex-direction:column;flex:1;min-width:0}
+.keybar .sw i{display:block;height:10px}
+.keybar .sw span{padding-top:4px;white-space:nowrap;min-height:22px}
+.detail{border-top:2px solid var(--rule);padding-top:16px}
+.detail h3{font-family:var(--serif);font-size:22px;color:var(--pine);margin-bottom:2px}
+.detail .big{font-family:var(--serif);font-size:44px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums lining-nums;margin:6px 0 4px}
+.detail .sub{color:var(--muted);font-size:14px}
+.detail table{width:100%;border-collapse:collapse;font-size:14px;margin-top:16px}
+.detail td{padding:8px 0;border-bottom:1px solid var(--line)}
+.detail td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:600;padding-left:12px}
+.callout{background:var(--amber-tint);border-left:3px solid var(--amber);padding:14px 16px;margin-top:18px;font-size:15px}
+.callout b{font-family:var(--serif);font-size:20px;font-weight:600;display:block;font-variant-numeric:tabular-nums lining-nums}
+
+/* charts */
+.chartbox{overflow-x:auto}
+.chartbox svg{display:block;min-width:560px;width:100%;max-width:860px;height:auto;font-family:var(--sans)}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--paper);font-size:13px;padding:6px 9px;opacity:0;transition:opacity .1s;z-index:30;max-width:240px}
+table.data{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+table.data th,table.data td{padding:9px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+table.data thead th{border-bottom:2px solid var(--rule);vertical-align:bottom}
+table.data th:first-child,table.data td:first-child{text-align:left;padding-left:0}
+table.data th button{font:inherit;font-weight:600;color:var(--muted);background:none;border:none;cursor:pointer;padding:0;text-align:right;white-space:normal;max-width:120px}
+table.data th button[aria-sort]{color:var(--pine)}
+table.data th button[aria-sort="descending"]::after{content:" \2193"}
+table.data th button[aria-sort="ascending"]::after{content:" \2191"}
+table.data tr.me td{background:var(--amber-tint);font-weight:600}
+.tablewrap{overflow-x:auto}
+
+/* form */
+.form{display:grid;gap:22px;max-width:640px}
+.field label,.field legend{display:block;font-weight:600;margin-bottom:6px;font-size:15px}
+.field .hint{font-size:14px;color:var(--muted);margin:-2px 0 8px}
+.field input,.field textarea,.field select{width:100%}
+.field textarea{min-height:120px;resize:vertical}
+fieldset{border:none;padding:0;margin:0}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px}
+.checks label{font-weight:400;display:flex;gap:8px;align-items:flex-start;font-size:15px;margin:0}
+.checks input{width:auto;margin-top:5px;accent-color:var(--pine)}
+button.primary{font:inherit;font-weight:600;background:var(--pine);color:var(--paper);border:none;border-radius:2px;padding:12px 24px;cursor:pointer;justify-self:start}
+button.primary:hover{background:#264c3d}
+button.primary:disabled{opacity:.5;cursor:not-allowed}
+.status{padding:12px 16px;font-size:15px;display:none;border-left:3px solid}
+.status.show{display:block}
+.status.ok{background:var(--tint);color:var(--pine)}
+.status.err{background:var(--amber-tint);color:var(--amber)}
+.aside .entry{margin-right:0;padding-right:0}
+.aside .entry:first-child{border-top:2px solid var(--rule)}
+.method ol,.method ul{padding-left:20px;max-width:72ch}
+.method li{margin-bottom:10px}
+footer{border-top:1px solid var(--line);padding:28px 0 44px;color:var(--muted);font-size:13px}
+.langnote{display:none;margin:20px 0 0;font-size:14px;color:var(--muted);border-left:3px solid var(--river);padding:6px 14px}
+
+@media (max-width:860px){
+ .wrap{padding:0 16px}
+ nav.tabs{order:3;flex-basis:100%;margin:0 -10px}nav.tabs a{padding:10px 10px 12px}header.site .wrap{gap:4px 16px;padding-top:10px}.brand{flex:1}
+ .choro text{font-size:19px;stroke-width:4px}.choro text .v{font-size:18px}#heromap text{font-size:18px}
+ .hero{grid-template-columns:1fr;gap:20px;padding:36px 0 32px}
+ #heromap{max-height:240px}
+ .mapwrap,.grid2,.ind{grid-template-columns:1fr;gap:18px}
+ .grid3{grid-template-columns:1fr}.grid3 .entry+.entry{padding-left:0;border-left:none;border-top:1px solid var(--line)}
+ .stats,.costrow{grid-template-columns:1fr 1fr}.stat:nth-child(3){border-left:none;padding-left:0}.stat{padding:18px 14px}.stat .v{font-size:30px}
+ .sigrank{grid-template-columns:1fr}
+ .signal{grid-template-columns:18px 1fr}.signal .d{grid-column:2}
+ .checks{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="site"><div class="wrap">
+  <a class="brand" href="#overview"><span data-t="brand"></span><small data-t="brand_sub"></small></a>
+  <nav class="tabs" aria-label="Main">
+    <a href="#overview" data-t="tab_overview"></a><a href="#map" data-t="tab_map"></a><a href="#rent" data-t="tab_rent"></a><a href="#profile" data-t="tab_profile"></a><a href="#compare" data-t="tab_compare"></a><a href="#future" data-t="tab_future"></a><a href="#report" data-t="tab_report"></a><a href="#method" data-t="tab_method"></a>
+  </nav>
+  <button type="button" class="langbtn" id="langBtn"></button>
+</div></header>
+<div class="countybar" id="countybar"><div class="wrap">
+  <label for="countySel" data-t="viewing"></label><select id="countySel"></select>
+  <span style="color:var(--muted)" data-t="carries"></span>
+</div></div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+<main class="wrap">
+<p class="langnote" id="langNote" data-t="lang_note"></p>
+
+<section class="page" id="page-overview" aria-labelledby="h-overview">
+  <div class="hero">
+    <div>
+      <h1 id="h-overview"><span data-t="hero_a"></span> <label for="heroSel" class="sr">County</label><select id="heroSel" class="inline-select"></select> <span data-t="hero_b"></span></h1>
+      <p class="lede" id="lede"></p>
+      <p class="by" data-t="by"></p>
+    </div>
+    <div><svg id="heromap" role="group"></svg><div class="herocap" data-t="herocap"></div></div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="finding"><h3 data-t="finding_h"></h3><p id="regionFinding"></p></div>
+
+  <div class="grid2">
+    <div>
+      <h2 data-t="why_h"></h2>
+      <p data-t="why_p1"></p>
+      <p data-t="why_p2"></p>
+    </div>
+    <div>
+      <h2 data-t="use_h"></h2>
+      <ol class="steps">
+        <li><span data-t="use_1"></span></li>
+        <li><span data-t="use_2"></span></li>
+        <li><span data-t="use_3"></span></li>
+        <li><span data-t="use_4"></span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="sec">
+    <h3 data-t="rank_h"></h3>
+    <p class="intro" data-t="rank_p"></p>
+    <div class="sigrank" id="sigrank"></div>
+  </div>
+
+  <div class="grid3 sec">
+    <div class="entry"><h3 data-t="card1_h"></h3><p data-t="card1_p"></p><a class="linkbtn" href="#map" data-t="card1_a"></a></div>
+    <div class="entry"><h3 data-t="card3_h"></h3><p data-t="card3_p"></p><a class="linkbtn" href="#rent" data-t="card3_a"></a></div>
+    <div class="entry"><h3 data-t="card2_h"></h3><p data-t="card2_p"></p><a class="linkbtn" href="#report" data-t="card2_a"></a></div>
+  </div>
+</section>
+
+<section class="page" id="page-map" aria-labelledby="h-map">
+  <div class="phead"><h2 id="h-map" data-t="map_h"></h2><p class="intro" data-t="map_p"></p></div>
+  <div class="ctl"><label for="mapMetric" data-t="indicator"></label><select id="mapMetric"></select></div>
+  <div class="mapwrap">
+    <div><svg id="mapsvg" class="choro" role="group"></svg><div class="keybar" id="mapKey" aria-hidden="true"></div></div>
+    <div class="detail" id="mapDetail" aria-live="polite"></div>
+  </div>
+</section>
+
+<section class="page" id="page-rent" aria-labelledby="h-rent">
+  <div class="phead"><h2 id="h-rent" data-t="rent_h"></h2><p class="intro" data-t="rent_p"></p></div>
+  <div class="ctl"><span class="lbl" data-t="show"></span><div class="seg" id="rentSeg" role="group"></div></div>
+  <div class="mapwrap">
+    <div><svg id="rentsvg" class="choro" role="group"></svg><div class="keybar" id="rentKey" aria-hidden="true"></div></div>
+    <div class="detail" id="rentDetail" aria-live="polite"></div>
+  </div>
+  <div class="sec">
+        <div class="chartbox" id="rentrank"></div>
+  </div>
+  <p class="note" data-t="rent_note"></p>
+</section>
+
+<section class="page" id="page-profile" aria-labelledby="h-profile">
+  <div class="phead"><h2 id="h-profile"></h2><p class="intro" data-t="prof_p"></p></div>
+  <h3 data-t="sig_h"></h3>
+  <p class="summary" id="sigsum"></p>
+  <ul class="signals" id="siglist"></ul>
+  <p class="note" data-t="sig_note"></p>
+  <div class="sec">
+    <h3 data-t="cost_h"></h3>
+    <p class="intro" data-t="cost_p"></p>
+    <div class="costrow" id="costrow"></div>
+  </div>
+  <div class="sec">
+    <h3 data-t="ind_h"></h3>
+    <p class="intro" data-t="ind_p"></p>
+    <div id="indlist"></div>
+  </div>
+</section>
+
+<section class="page" id="page-compare" aria-labelledby="h-compare">
+  <div class="phead"><h2 id="h-compare" data-t="cmp_h"></h2><p class="intro" data-t="cmp_p"></p></div>
+  <h3 data-t="rankc_h" style="font-family:var(--serif);font-size:23px;color:var(--pine)"></h3>
+  <div class="ctl"><label for="rankMetric" data-t="indicator"></label><select id="rankMetric"></select></div>
+  <div class="chartbox" id="rankchart"></div>
+  <div class="sec">
+    <h3 data-t="sc_h"></h3>
+    <p class="intro" data-t="sc_p"></p>
+    <div class="ctl"><label for="xMetric" data-t="across"></label><select id="xMetric"></select><label for="yMetric" data-t="up"></label><select id="yMetric"></select></div>
+    <div class="chartbox" id="scatter"></div>
+  </div>
+  <div class="sec">
+    <h3 data-t="tbl_h"></h3>
+    <p class="intro" data-t="tbl_p"></p>
+    <div class="tablewrap" id="tablewrap"></div>
+  </div>
+</section>
+
+<section class="page" id="page-future" aria-labelledby="h-future">
+  <div class="phead"><h2 id="h-future" data-t="fut_h"></h2><p class="intro" data-t="fut_p"></p></div>
+  <div class="chartbox" id="fcchart"></div>
+  <div class="sec">
+    <h3 data-t="share_h"></h3>
+    <p class="intro" data-t="share_p"></p>
+    <div class="chartbox" id="sharechart"></div>
+  </div>
+  <p class="note" data-t="fut_note"></p>
+</section>
+
+<section class="page" id="page-report" aria-labelledby="h-report">
+  <div class="phead"><h2 id="h-report" data-t="rep_h"></h2><p class="intro" data-t="rep_p"></p></div>
+  <div class="grid2" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)">
+    <form class="form" id="reportForm" novalidate>
+      <div class="field"><label for="fCounty" data-t="f_county"></label><select id="fCounty"></select></div>
+      <div class="field"><label for="fArea" data-t="f_area"></label><p class="hint" data-t="f_area_h"></p><input id="fArea" maxlength="80" autocomplete="off"></div>
+      <fieldset class="field"><legend data-t="f_types"></legend><p class="hint" data-t="f_types_h"></p><div class="checks" id="fTypes"></div></fieldset>
+      <div class="field"><label for="fWhen" data-t="f_when"></label><select id="fWhen"></select></div>
+      <div class="field"><label for="fRole" data-t="f_role"></label><select id="fRole"></select></div>
+      <div class="field"><label for="fText" data-t="f_text"></label><p class="hint" data-t="f_text_h"></p><textarea id="fText" maxlength="600"></textarea></div>
+      <input type="text" id="fHp" name="_gotcha" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+      <div class="status" id="fStatus" role="status"></div>
+      <button type="submit" class="primary" id="fSubmit" data-t="f_submit"></button>
+    </form>
+    <div class="aside">
+      <div class="entry"><h3 data-t="rs_h"></h3><div id="reportSummary" style="font-size:15px"></div></div>
+      <div class="entry"><h3 data-t="help_h"></h3><p style="font-size:15px;margin:0;color:var(--ink)" data-t="help_p"></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="page method" id="page-method" aria-labelledby="h-method">
+  <div class="phead"><h2 id="h-method" data-t="m_h"></h2><p class="intro" data-t="m_p"></p></div>
+  <div class="grid2">
+    <div><h3 data-t="m_sig_h"></h3><ol id="mSignals"></ol></div>
+    <div><h3 data-t="m_data_h"></h3><ul id="mData"></ul></div>
+  </div>
+  <div class="sec">
+    <h3 data-t="m_next_h"></h3>
+    <div class="tablewrap"><table class="data" style="font-size:15px"><thead><tr><th data-t="m_add"></th><th style="text-align:left" data-t="m_why"></th></tr></thead><tbody id="mNext"></tbody></table></div>
+  </div>
+  <div class="sec">
+    <h3 data-t="m_about_h"></h3>
+    <p style="max-width:72ch" data-t="m_about_p"></p>
+    <p>Ishaan Somaka</p>
+  </div>
+</section>
+</main>
+<footer><div class="wrap" data-t="footer"></div></footer>
+<script>
+// Paste your Formspree form address between the quotes, e.g. 'https://formspree.io/f/abcd1234'
+const FORM_ENDPOINT = '';
+const DATA = {"counties":{"Cherokee":{"hu":[80182,106407,1],"renter":[19.4,22.7,1],"rentburden":[49.9,56.7,1],"costburden":[36.3,26.8,1],"vacancy":[7.3,4.6,1],"novehicle":[2.4,2.3,0],"forecast":31,"income":[96460,108115,12.1,67053],"poverty":[7.4,7.0,0],"unemp":[7.1,3.3,1],"rent":[1799,435100]},"Clayton":{"hu":[104199,115476,1],"renter":[41.0,45.5,1],"rentburden":[57.3,62.9,1],"costburden":[46.0,44.1,0],"vacancy":[16.9,8.2,1],"novehicle":[7.5,7.0,0],"forecast":14,"income":[62572,59806,-4.4,43496],"poverty":[16.7,17.9,0],"unemp":[13.1,7.2,1],"rent":[1433,222300]},"Cobb":{"hu":[283198,314104,1],"renter":[30.4,32.9,1],"rentburden":[49.6,50.1,0],"costburden":[35.0,28.7,1],"vacancy":[9.3,5.8,1],"novehicle":[3.7,3.9,0],"forecast":38,"income":[94564,102738,8.6,65735],"poverty":[10.6,8.7,1],"unemp":[7.2,4.5,1],"rent":[1730,407200]},"DeKalb":{"hu":[301996,330830,1],"renter":[41.4,41.2,0],"rentburden":[53.7,58.5,1],"costburden":[43.1,37.5,1],"vacancy":[12.3,13.2,1],"novehicle":[9.4,7.4,1],"forecast":33,"income":[73986,80644,9.0,51430],"poverty":[16.1,13.7,1],"unemp":[11.5,6.4,1],"rent":[1692,357800]},"Douglas":{"hu":[50276,56187,1],"renter":[28.5,33.0,1],"rentburden":[48.7,50.4,0],"costburden":[38.2,31.0,1],"vacancy":[11.0,7.3,1],"novehicle":[3.2,3.2,0],"forecast":9,"income":[80641,82984,2.9,56056],"poverty":[11.3,10.9,0],"unemp":[10.6,6.3,1],"rent":[1570,296900]},"Fayette":{"hu":[40205,46453,1],"renter":[15.5,19.9,1],"rentburden":[51.9,58.7,0],"costburden":[31.6,28.7,1],"vacancy":[6.3,4.1,1],"novehicle":[2.3,3.1,1],"forecast":5,"income":[119095,111978,-6.0,82787],"poverty":[4.7,5.6,0],"unemp":[5.6,3.8,1],"rent":[1898,436400]},"Forsyth":{"hu":[61053,92575,1],"renter":[13.2,15.6,1],"rentburden":[47.8,45.7,0],"costburden":[30.0,20.7,1],"vacancy":[9.3,3.8,1],"novehicle":[2.2,1.9,0],"forecast":42,"income":[125038,143784,15.0,86918],"poverty":[6.0,4.3,1],"unemp":[6.1,3.5,1],"rent":[2090,550400]},"Fulton":{"hu":[430124,507119,1],"renter":[44.0,45.7,1],"rentburden":[50.6,50.5,0],"costburden":[41.0,35.2,1],"vacancy":[16.9,8.8,1],"novehicle":[12.2,10.1,1],"forecast":88,"income":[82367,95292,15.7,57256],"poverty":[15.3,12.3,1],"unemp":[8.8,5.4,1],"rent":[1732,458800]},"Gwinnett":{"hu":[286599,340962,1],"renter":[27.9,33.8,1],"rentburden":[50.8,61.8,1],"costburden":[39.0,37.0,1],"vacancy":[9.2,4.1,1],"novehicle":[2.8,3.8,1],"forecast":61,"income":[91565,87890,-4.0,63650],"poverty":[11.0,10.8,0],"unemp":[8.3,4.3,1],"rent":[1810,380900]},"Henry":{"hu":[74126,91424,1],"renter":[19.8,25.1,1],"rentburden":[50.1,57.5,1],"costburden":[37.0,33.9,1],"vacancy":[10.5,5.1,1],"novehicle":[2.2,2.3,0],"forecast":23,"income":[93009,83146,-10.6,64654],"poverty":[8.3,9.2,0],"unemp":[8.6,6.2,1],"rent":[1674,313900]},"Rockdale":{"hu":[32514,36221,1],"renter":[31.1,30.4,0],"rentburden":[52.7,53.2,0],"costburden":[38.5,33.5,1],"vacancy":[12.2,5.0,1],"novehicle":[5.6,3.1,1],"forecast":5,"income":[80960,77247,-4.6,56278],"poverty":[12.3,10.7,0],"unemp":[12.1,5.9,1],"rent":[1525,292900]}},"region":{"hu":[1744472,2037758,null],"renter":[33.6,36.1,null],"rentburden":[51.5,55.0,null],"costburden":[39.1,33.8,null],"vacancy":[12.1,7.4,null],"novehicle":[6.5,5.8,null],"forecast":349,"poverty":[12.4,10.9,null],"unemp":[9.0,5.1,null],"income":null},"cpi":[218.056,313.689],"geo":{"type":"FeatureCollection","features":[{"type":"Feature","id":"13113","properties":{"name":"Fayette"},"geometry":{"type":"Polygon","coordinates":[[[-84.497527,33.257422],[-84.62722,33.440078],[-84.60954,33.502511],[-84.458665,33.550933],[-84.381759,33.463414],[-84.388118,33.352465],[-84.432907,33.2565],[-84.497527,33.257422]]]}},{"type":"Feature","id":"13067","properties":{"name":"Cobb"},"geometry":{"type":"Polygon","coordinates":[[[-84.724435,33.881859],[-84.737836,34.079399],[-84.729235,34.079199],[-84.722636,34.079199],[-84.721936,34.079099],[-84.687222,34.0785],[-84.684745,34.0785],[-84.682835,34.078399],[-84.676415,34.078298],[-84.674935,34.078199],[-84.673935,34.078299],[-84.672635,34.078199],[-84.659234,34.077999],[-84.521992,34.075399],[-84.418927,34.073298],[-84.383027,33.9638],[-84.442708,33.901543],[-84.480134,33.817319],[-84.578132,33.743507],[-84.619892,33.805024],[-84.724139,33.80617],[-84.723969,33.815306],[-84.725181,33.816995],[-84.725035,33.819905],[-84.724435,33.881859]]]}},{"type":"Feature","id":"13057","properties":{"name":"Cherokee"},"geometry":{"type":"Polygon","coordinates":[[[-84.258075,34.335156],[-84.258743,34.185909],[-84.328263,34.186144],[-84.418927,34.073298],[-84.521992,34.075399],[-84.659234,34.077999],[-84.653232,34.41259],[-84.58263,34.381492],[-84.257586,34.380992],[-84.257652,34.375111],[-84.257812,34.372631],[-84.258075,34.335156]]]}},{"type":"Feature","id":"13063","properties":{"name":"Clayton"},"geometry":{"type":"Polygon","coordinates":[[[-84.388118,33.352465],[-84.381759,33.463414],[-84.458665,33.550933],[-84.458579,33.556242],[-84.458924,33.559759],[-84.458927,33.565911],[-84.45863,33.572107],[-84.458399,33.572743],[-84.458627,33.586456],[-84.458514,33.608625],[-84.457726,33.64887],[-84.365325,33.647809],[-84.360224,33.647909],[-84.350224,33.647908],[-84.282619,33.647009],[-84.281273,33.647411],[-84.283518,33.502514],[-84.353584,33.436165],[-84.3544,33.352514],[-84.388118,33.352465]]]}},{"type":"Feature","id":"13247","properties":{"name":"Rockdale"},"geometry":{"type":"Polygon","coordinates":[[[-84.023713,33.752808],[-83.984555,33.784332],[-83.982033,33.786054],[-83.954499,33.76892],[-83.953332,33.768034],[-83.914823,33.744203],[-83.972655,33.605482],[-84.024279,33.548226],[-84.024854,33.547507],[-84.044493,33.525776],[-84.136289,33.57233],[-84.17213,33.621919],[-84.181584,33.629174],[-84.184143,33.646157],[-84.104334,33.636025],[-84.056614,33.726608],[-84.023713,33.752808]]]}},{"type":"Feature","id":"13117","properties":{"name":"Forsyth"},"geometry":{"type":"Polygon","coordinates":[[[-84.258075,34.335156],[-83.957077,34.334011],[-83.927284,34.279399],[-83.989059,34.195732],[-84.062841,34.167873],[-84.074624,34.163687],[-84.094763,34.131708],[-84.101343,34.106305],[-84.10261,34.103788],[-84.105403,34.102223],[-84.107143,34.10003],[-84.109894,34.098423],[-84.117801,34.065315],[-84.097692,34.050654],[-84.200373,34.090118],[-84.258934,34.109539],[-84.258743,34.185909],[-84.258075,34.335156]]]}},{"type":"Feature","id":"13089","properties":{"name":"DeKalb"},"geometry":{"type":"Polygon","coordinates":[[[-84.254149,33.647045],[-84.281273,33.647411],[-84.282619,33.647009],[-84.350224,33.647908],[-84.349799,33.664035],[-84.348325,33.852503],[-84.348138,33.857692],[-84.348225,33.859502],[-84.348525,33.861903],[-84.348125,33.864903],[-84.348325,33.867903],[-84.348125,33.879203],[-84.348425,33.881902],[-84.348224,33.8929],[-84.348225,33.904802],[-84.348025,33.918302],[-84.347825,33.918902],[-84.347925,33.927001],[-84.347823,33.938017],[-84.276822,33.9577],[-84.275722,33.954201],[-84.271922,33.9559],[-84.266306,33.947577],[-84.272216,33.944853],[-84.265337,33.932576],[-84.259011,33.91882],[-84.256022,33.914401],[-84.250413,33.910812],[-84.23222,33.902002],[-84.21663,33.884976],[-84.20472,33.877003],[-84.203519,33.873003],[-84.187005,33.865515],[-84.179418,33.864403],[-84.172139,33.857516],[-84.023713,33.752808],[-84.056614,33.726608],[-84.104334,33.636025],[-84.184143,33.646157],[-84.223952,33.646572],[-84.224235,33.630657],[-84.245453,33.63073],[-84.254149,33.647045]]]}},{"type":"Feature","id":"13097","properties":{"name":"Douglas"},"geometry":{"type":"Polygon","coordinates":[[[-84.769935,33.784704],[-84.741348,33.788568],[-84.725477,33.788579],[-84.724122,33.791439],[-84.724139,33.80617],[-84.619892,33.805024],[-84.578132,33.743507],[-84.586826,33.729114],[-84.594332,33.729007],[-84.601732,33.724408],[-84.608032,33.712908],[-84.621232,33.704508],[-84.632131,33.700312],[-84.630117,33.693116],[-84.752735,33.63021],[-84.763097,33.614211],[-84.775591,33.609662],[-84.805655,33.58642],[-84.808934,33.574085],[-84.905788,33.573378],[-84.902546,33.661066],[-84.901688,33.780703],[-84.879151,33.774758],[-84.832708,33.776019],[-84.832705,33.778522],[-84.799853,33.779909],[-84.795109,33.779809],[-84.791993,33.781162],[-84.769935,33.784704]]]}},{"type":"Feature","id":"13121","properties":{"name":"Fulton"},"geometry":{"type":"Polygon","coordinates":[[[-84.752735,33.63021],[-84.630117,33.693116],[-84.632131,33.700312],[-84.621232,33.704508],[-84.608032,33.712908],[-84.601732,33.724408],[-84.594332,33.729007],[-84.586826,33.729114],[-84.578132,33.743507],[-84.480134,33.817319],[-84.442708,33.901543],[-84.383027,33.9638],[-84.418927,34.073298],[-84.328263,34.186144],[-84.258743,34.185909],[-84.258934,34.109539],[-84.200373,34.090118],[-84.097692,34.050654],[-84.276822,33.9577],[-84.347823,33.938017],[-84.347925,33.927001],[-84.347825,33.918902],[-84.348025,33.918302],[-84.348225,33.904802],[-84.348224,33.8929],[-84.348425,33.881902],[-84.348125,33.879203],[-84.348325,33.867903],[-84.348125,33.864903],[-84.348525,33.861903],[-84.348225,33.859502],[-84.348138,33.857692],[-84.348325,33.852503],[-84.349799,33.664035],[-84.350224,33.647908],[-84.360224,33.647909],[-84.365325,33.647809],[-84.457726,33.64887],[-84.458514,33.608625],[-84.458627,33.586456],[-84.458399,33.572743],[-84.45863,33.572107],[-84.458927,33.565911],[-84.458924,33.559759],[-84.458579,33.556242],[-84.458665,33.550933],[-84.60954,33.502511],[-84.850713,33.511457],[-84.808934,33.574085],[-84.805655,33.58642],[-84.775591,33.609662],[-84.763097,33.614211],[-84.752735,33.63021]]]}},{"type":"Feature","id":"13135","properties":{"name":"Gwinnett"},"geometry":{"type":"Polygon","coordinates":[[[-84.109894,34.098423],[-84.107143,34.10003],[-84.105403,34.102223],[-84.10261,34.103788],[-84.101343,34.106305],[-84.094763,34.131708],[-84.074624,34.163687],[-84.062841,34.167873],[-83.86803,34.098281],[-83.817682,34.127493],[-83.869115,34.004316],[-83.799104,33.929844],[-83.982033,33.786054],[-83.984555,33.784332],[-84.023713,33.752808],[-84.172139,33.857516],[-84.179418,33.864403],[-84.187005,33.865515],[-84.203519,33.873003],[-84.20472,33.877003],[-84.21663,33.884976],[-84.23222,33.902002],[-84.250413,33.910812],[-84.256022,33.914401],[-84.259011,33.91882],[-84.265337,33.932576],[-84.272216,33.944853],[-84.266306,33.947577],[-84.271922,33.9559],[-84.275722,33.954201],[-84.276822,33.9577],[-84.097692,34.050654],[-84.117801,34.065315],[-84.109894,34.098423]]]}},{"type":"Feature","id":"13151","properties":{"name":"Henry"},"geometry":{"type":"Polygon","coordinates":[[[-84.283518,33.502514],[-84.281273,33.647411],[-84.254149,33.647045],[-84.245453,33.63073],[-84.224235,33.630657],[-84.223952,33.646572],[-84.184143,33.646157],[-84.181584,33.629174],[-84.17213,33.621919],[-84.136289,33.57233],[-84.044493,33.525776],[-83.923913,33.444194],[-84.044594,33.333656],[-84.044597,33.333495],[-84.042663,33.333501],[-84.102582,33.298191],[-84.150581,33.335639],[-84.3544,33.352514],[-84.353584,33.436165],[-84.283518,33.502514]]]}}]}};
+const NAMES = Object.keys(DATA.counties).sort();
+const R = DATA.region, C = n => DATA.counties[n];
+let lang='en'; try{const l=localStorage.getItem('lang'); if(l==='es')lang='es';}catch(e){}
+const L=(en,es)=>lang==='es'?es:en;
+
+const STR={
+ brand:['Housing Pressure Toolkit','Presión de Vivienda'],brand_sub:['Atlanta Region','Región de Atlanta'],tab_rent:['Rent map','Mapa de alquileres'],
+ herocap:['The 11-county Atlanta region. Click a county to select it.','La región de Atlanta de 11 condados. Haga clic en un condado para seleccionarlo.'],
+ card3_h:['Compare what housing costs','Compare cuánto cuesta la vivienda'],card3_p:['Median rent, home values, and the income needed to afford rent in every county.','Alquiler mediano, valor de la vivienda y el ingreso necesario para pagar el alquiler en cada condado.'],card3_a:['Open the rent map','Abrir el mapa de alquileres'],
+ rent_h:['What housing costs across the region','Cuánto cuesta la vivienda en la región'],
+ rent_p:['Median rent and home values from the 2020\u20132024 American Community Survey. Choose a measure, then click a county to compare it with the rest of the region.','Alquiler mediano y valor de la vivienda según la Encuesta sobre la Comunidad Estadounidense 2020\u20132024. Elija una medida y haga clic en un condado para compararlo con el resto de la región.'],
+ show:['Show','Mostrar'],rent_rank_h:['All 11 counties, ranked','Los 11 condados, ordenados'],
+ rent_note:['Source: U.S. Census Bureau, American Community Survey 5-year estimates, 2020\u20132024, via Census QuickFacts. Median gross rent includes contract rent plus estimated utilities. Income needed applies the federal guideline that housing should take no more than 30% of income (median rent \u00d7 12 \u00f7 0.30). Comparing it with a county\u2019s median household income understates pressure on renters, who typically earn less than homeowners.','Fuente: Oficina del Censo de EE. UU., estimaciones de 5 años de la Encuesta sobre la Comunidad Estadounidense, 2020\u20132024, a través de Census QuickFacts. El alquiler bruto mediano incluye el alquiler del contrato más los servicios estimados. El ingreso necesario aplica la pauta federal de que la vivienda no debe costar más del 30% del ingreso (alquiler mediano \u00d7 12 \u00f7 0.30). Compararlo con el ingreso medio del hogar del condado subestima la presión sobre los inquilinos, que suelen ganar menos que los propietarios.'],
+ cost_h:['Housing costs today','Costos de vivienda hoy'],cost_p:['2020\u20132024 Census estimates. See the Rent map for how this county compares.','Estimaciones del Censo 2020\u20132024. Vea el Mapa de alquileres para comparar este condado.'],
+ tab_overview:['Overview','Resumen'],tab_map:['Map','Mapa'],tab_profile:['County profile','Perfil'],tab_compare:['Compare','Comparar'],tab_future:['Future growth','Crecimiento'],tab_report:['Report a change','Reportar'],tab_method:['Method','Método'],
+ viewing:['Viewing','Viendo'],carries:['Your choice carries across every tab.','Su selección se mantiene en todas las pestañas.'],
+ lang_note:['','Esta página fue traducida al español para que más personas puedan usarla. Puede contener errores; para asuntos legales, comuníquese con una organización de ayuda legal.'],
+ hero_a:['How has housing changed in','¿Cómo ha cambiado la vivienda en el'],hero_b:['since 2010?','desde 2010?'],
+ by:['A research tool by Ishaan Somaka, built on U.S. Census data compiled by the Atlanta Regional Commission.','Una herramienta de investigación de Ishaan Somaka, basada en datos del Censo de EE. UU. compilados por la Comisión Regional de Atlanta.'],
+ finding_h:['Across the region, pressure is concentrating on renters','En toda la región, la presión se concentra en los inquilinos'],
+ why_h:['Why this toolkit exists','Por qué existe esta herramienta'],
+ why_p1:['Displacement rarely happens all at once. Rents creep up at renewal, buildings change hands, and neighbors leave one by one. By the time it shows up clearly in official statistics, many families have already moved.','El desplazamiento rara vez ocurre de golpe. Los alquileres suben al renovar el contrato, los edificios cambian de dueño y los vecinos se van uno por uno. Cuando aparece claramente en las estadísticas oficiales, muchas familias ya se han mudado.'],
+ why_p2:['This toolkit brings together public data on housing, income, and growth across the 11-county Atlanta region to highlight early signs of pressure, so residents, community groups, and local leaders can act sooner.','Esta herramienta reúne datos públicos sobre vivienda, ingresos y crecimiento en los 11 condados de la región de Atlanta para señalar las primeras señales de presión, de modo que residentes, grupos comunitarios y líderes locales puedan actuar antes.'],
+ use_h:['How to use it','Cómo usarla'],
+ use_1:['<b>Pick a county</b> in the headline above. Your choice follows you to every page.','<b>Elija un condado</b> en el título de arriba. Su selección se mantiene en todas las páginas.'],
+ use_2:['<b>Check the signals</b> on the <a href="#profile">County profile</a> page to see which warning signs are present and why.','<b>Revise las señales</b> en la página <a href="#profile">Perfil del condado</a> para ver qué señales de alerta están presentes y por qué.'],
+ use_3:['<b>Explore</b> the <a href="#map">Map</a> and <a href="#compare">Compare</a> pages to see how counties differ.','<b>Explore</b> las páginas <a href="#map">Mapa</a> y <a href="#compare">Comparar</a> para ver cómo se diferencian los condados.'],
+ use_4:['<b>Report what you see</b> on your street. Residents often notice change before data does.','<b>Reporte lo que ve</b> en su calle. Los residentes a menudo notan los cambios antes que los datos.'],
+ rank_h:['Signals across the region','Señales en toda la región'],
+ rank_p:['How many of the seven early warning signals are present in each county. Click a county to select it.','Cuántas de las siete señales de alerta están presentes en cada condado. Haga clic en un condado para seleccionarlo.'],
+ card1_h:['See where pressure is building','Vea dónde aumenta la presión'],card1_p:['Color the 11-county region by any indicator and click a county to see its numbers.','Coloree la región de 11 condados según cualquier indicador y haga clic en un condado para ver sus cifras.'],card1_a:['Open the map','Abrir el mapa'],
+ card2_h:['Seeing change on your street?','¿Ve cambios en su calle?'],card2_p:['Report what you are seeing, with no name or personal information.','Reporte lo que está viendo, sin nombre ni información personal.'],card2_a:['Report a change','Reportar un cambio'],
+ map_h:['Regional map','Mapa regional'],map_p:['Choose an indicator to color the map. Darker counties have higher values. Click or tab to a county to select it.','Elija un indicador para colorear el mapa. Los condados más oscuros tienen valores más altos. Haga clic o use el tabulador para seleccionar un condado.'],
+ indicator:['Indicator','Indicador'],
+ prof_p:['Early warning signals and every indicator for this county, compared with the 11-county region.','Señales de alerta y todos los indicadores de este condado, comparados con la región de 11 condados.'],
+ sig_h:['Early warning signals','Señales de alerta temprana'],
+ sig_note:['These signals are not a risk score. They have not yet been tested against which places actually saw displacement, so each is shown separately with the reason it fired.','Estas señales no son una calificación de riesgo. Todavía no se han comparado con los lugares donde realmente ocurrió desplazamiento, por eso cada una se muestra por separado con su explicación.'],
+ ind_h:['Indicators','Indicadores'],
+ ind_p:['A change marked "within margin of error" may not be real, because Census estimates are based on samples.','Un cambio marcado como "dentro del margen de error" puede no ser real, porque las estimaciones del Censo se basan en muestras.'],
+ cmp_h:['Compare counties','Comparar condados'],cmp_p:['Rank all 11 counties, look for relationships between two indicators, or sort the full table.','Ordene los 11 condados, busque relaciones entre dos indicadores u ordene la tabla completa.'],
+ rankc_h:['Ranking','Clasificación'],sc_h:['Relationship explorer','Explorador de relaciones'],
+ sc_p:['Each dot is a county. Try housing growth against the change in renter cost strain.','Cada punto es un condado. Pruebe el crecimiento de vivienda frente al cambio en la sobrecarga de los inquilinos.'],
+ across:['Across','Horizontal'],up:['Up','Vertical'],
+ tbl_h:['Full data table','Tabla completa de datos'],tbl_p:['Click a column heading to sort.','Haga clic en el encabezado de una columna para ordenar.'],
+ fut_h:['Where growth is headed','Hacia dónde va el crecimiento'],
+ fut_p:["ARC forecasts about 350,000 new households across the region by 2035. When a county is expected to absorb more of that growth than its share of today's homes, pressure on land and rents is likely to rise.",'La ARC pronostica unos 350,000 hogares nuevos en la región para 2035. Cuando se espera que un condado absorba una parte de ese crecimiento mayor que su parte de las viviendas actuales, es probable que aumente la presión sobre el terreno y los alquileres.'],
+ share_h:["Today's share of homes vs. share of future growth",'Parte de las viviendas hoy frente a parte del crecimiento futuro'],
+ share_p:['Counties where the orange dot sits to the right of the gray dot are forecast to grow faster than their current size would suggest.','Los condados donde el punto naranja está a la derecha del punto gris crecerán más rápido de lo que sugiere su tamaño actual.'],
+ fut_note:['Forecast source: ARC Series 17 forecasts, compiled by HR&amp;A Advisors in the ARC Board meeting packet of March 11, 2026. Current homes: ACS 2020–2024.','Fuente del pronóstico: pronósticos Serie 17 de la ARC, compilados por HR&amp;A Advisors en el paquete de la reunión de la Junta de la ARC del 11 de marzo de 2026. Viviendas actuales: ACS 2020–2024.'],
+ rep_h:['Report a change','Reportar un cambio'],
+ rep_p:["Data shows change only after it happens. If you're seeing signs of housing pressure where you live, tell us here. Do not include names, phone numbers, or street addresses. Reports are reviewed privately and always kept separate from the Census data.",'Los datos muestran los cambios solo después de que ocurren. Si ve señales de presión de vivienda donde vive, cuéntenos aquí. No incluya nombres, números de teléfono ni direcciones. Los reportes se revisan en privado y siempre se mantienen separados de los datos del Censo.'],
+ f_county:['County','Condado'],f_area:['Neighborhood or area (optional)','Vecindario o zona (opcional)'],f_area_h:['A neighborhood name or nearby intersection. No street addresses.','El nombre de un vecindario o una intersección cercana. Sin direcciones.'],
+ f_types:['What are you seeing?','¿Qué está viendo?'],f_types_h:['Choose all that apply.','Elija todas las opciones que correspondan.'],
+ f_when:['When did you notice it?','¿Cuándo lo notó?'],f_role:['You are a','Usted es'],
+ f_text:['Tell us more (optional)','Cuéntenos más (opcional)'],f_text_h:['What changed, and how is it affecting people? Up to 600 characters.','¿Qué cambió y cómo está afectando a las personas? Hasta 600 caracteres.'],
+ f_submit:['Submit report','Enviar reporte'],rs_h:['How reports are used','Cómo se usan los reportes'],
+ help_h:['Need help now?','¿Necesita ayuda ahora?'],
+ help_p:["Fulton, DeKalb, Cobb, Gwinnett, or Clayton: Atlanta Legal Aid, 404-524-5811. All other counties, including Forsyth: Georgia Legal Services, 1-833-457-7529. Rent, utility, or shelter help: dial 2-1-1. If you've been served eviction papers, you have 7 days to file an answer with Magistrate Court.",'Fulton, DeKalb, Cobb, Gwinnett o Clayton: Atlanta Legal Aid, 404-524-5811. Todos los demás condados, incluido Forsyth: Georgia Legal Services, 1-833-457-7529. Ayuda con alquiler, servicios o refugio: marque 2-1-1. Si recibió documentos de desalojo, tiene 7 días para presentar una respuesta en el Tribunal de Magistrados (Magistrate Court).'],
+ m_h:['How this works','Cómo funciona'],m_p:['Every number on this site can be traced to a public source, and every rule is written out here.','Cada cifra de este sitio proviene de una fuente pública, y cada regla está explicada aquí.'],
+ m_sig_h:['The seven signals','Las siete señales'],m_data_h:['Data and limits','Datos y limitaciones'],m_next_h:['What comes next','Próximos pasos'],m_add:['Addition','Mejora'],m_why:['Why it matters','Por qué importa'],
+ m_about_h:['About this project','Sobre este proyecto'],
+ m_about_p:['This toolkit grows out of my research paper, <i>Reclaiming Urban Belonging: Policy Interventions to Reverse Gentrification in Atlanta</i>, and conversations with local officials, housing organizations, and former economics faculty at Cornell University, New York University, and Georgia State University. Its goal is to turn public data into early warning that residents and decision-makers can use. It is general information, not legal advice.','Esta herramienta surge de mi trabajo de investigación, <i>Reclaiming Urban Belonging: Policy Interventions to Reverse Gentrification in Atlanta</i>, y de conversaciones con funcionarios locales, organizaciones de vivienda y antiguos profesores de economía de la Universidad Cornell, la Universidad de Nueva York y la Universidad Estatal de Georgia. Su objetivo es convertir datos públicos en alertas tempranas que residentes y responsables de decisiones puedan usar. Es información general, no asesoría legal.'],
+ footer:['Data: U.S. Census Bureau American Community Survey via the Atlanta Regional Commission Open Data &amp; Mapping Hub; ARC Series 17 forecasts; U.S. Bureau of Labor Statistics CPI-U. Last updated September 2026.','Datos: Encuesta sobre la Comunidad Estadounidense (ACS) de la Oficina del Censo de EE. UU., a través del Open Data &amp; Mapping Hub de la Comisión Regional de Atlanta; pronósticos Serie 17 de la ARC; índice CPI-U de la Oficina de Estadísticas Laborales de EE. UU. Actualizado en septiembre de 2026.']
+};
+const T=k=>STR[k]?STR[k][lang==='es'?1:0]:k;
+const cn=n=>L(n+' County','Condado de '+n);
+const fmt1=x=>(Math.round(x*10)/10).toFixed(1);
+const money=x=>'$'+Math.round(x).toLocaleString('en-US');
+const growth=v=>(v[1]-v[0])/v[0]*100;
+const fcShare=n=>C(n).forecast/R.forecast*100, huShare=n=>C(n).hu[1]/R.hu[1]*100;
+const pts=x=>(x>=0?'+':'')+fmt1(x)+' pts';
+const sgn=x=>(x>=0?'+':'')+fmt1(x);
+
+const M=[
+ {id:'growth',l:['Housing growth since 2010','Crecimiento de vivienda desde 2010'],get:n=>growth(C(n).hu),reg:()=>growth(R.hu),f:x=>'+'+fmt1(x)+'%'},
+ {id:'renter',l:['Renter share, 2024','Proporción de inquilinos, 2024'],get:n=>C(n).renter[1],reg:()=>R.renter[1],f:x=>fmt1(x)+'%'},
+ {id:'renterCh',l:['Change in renter share','Cambio en la proporción de inquilinos'],get:n=>C(n).renter[1]-C(n).renter[0],reg:()=>R.renter[1]-R.renter[0],f:pts},
+ {id:'rb',l:['Renters under cost strain, 2024','Inquilinos con sobrecarga de costos, 2024'],get:n=>C(n).rentburden[1],reg:()=>R.rentburden[1],f:x=>fmt1(x)+'%'},
+ {id:'rbCh',l:['Change in renter cost strain','Cambio en la sobrecarga de inquilinos'],get:n=>C(n).rentburden[1]-C(n).rentburden[0],reg:()=>R.rentburden[1]-R.rentburden[0],f:pts},
+ {id:'cb',l:['All households under cost strain, 2024','Todos los hogares con sobrecarga de costos, 2024'],get:n=>C(n).costburden[1],reg:()=>R.costburden[1],f:x=>fmt1(x)+'%'},
+ {id:'vac',l:['Vacancy rate, 2024','Tasa de desocupación, 2024'],get:n=>C(n).vacancy[1],reg:()=>R.vacancy[1],f:x=>fmt1(x)+'%'},
+ {id:'vacCh',l:['Change in vacancy rate','Cambio en la tasa de desocupación'],get:n=>C(n).vacancy[1]-C(n).vacancy[0],reg:()=>R.vacancy[1]-R.vacancy[0],f:pts},
+ {id:'inc',l:['Median household income, 2024','Ingreso medio del hogar, 2024'],get:n=>C(n).income[1],reg:()=>null,f:money},
+ {id:'incCh',l:['Real income change since 2010','Cambio real del ingreso desde 2010'],get:n=>C(n).income[2],reg:()=>null,f:x=>sgn(x)+'%'},
+ {id:'pov',l:['Poverty rate, 2024','Tasa de pobreza, 2024'],get:n=>C(n).poverty[1],reg:()=>R.poverty[1],f:x=>fmt1(x)+'%'},
+ {id:'unemp',l:['Unemployment rate, 2024','Tasa de desempleo, 2024'],get:n=>C(n).unemp[1],reg:()=>R.unemp[1],f:x=>fmt1(x)+'%'},
+ {id:'nv',l:['Households without a car, 2024','Hogares sin automóvil, 2024'],get:n=>C(n).novehicle[1],reg:()=>R.novehicle[1],f:x=>fmt1(x)+'%'},
+ {id:'rent',l:['Median gross rent, 2020\u201324','Alquiler bruto mediano, 2020\u201324'],s:['Median rent','Alquiler mediano'],get:n=>C(n).rent[0],reg:()=>null,f:money},
+ {id:'need',l:['Income needed to afford median rent','Ingreso necesario para pagar el alquiler mediano'],s:['Income needed','Ingreso necesario'],get:n=>C(n).rent[0]*12/0.3,reg:()=>null,f:money},
+ {id:'val',l:['Median home value, 2020\u201324','Valor mediano de la vivienda, 2020\u201324'],s:['Home value','Valor de vivienda'],get:n=>C(n).rent[1],reg:()=>null,f:money},
+ {id:'vti',l:['Home value to income ratio','Relación valor de vivienda/ingreso'],s:['Value to income','Valor/ingreso'],get:n=>C(n).rent[1]/C(n).income[1],reg:()=>null,f:x=>fmt1(x)+'\u00d7'},
+ {id:'fc',l:['Share of forecast growth to 2035','Parte del crecimiento pronosticado a 2035'],get:n=>fcShare(n),reg:()=>null,f:x=>fmt1(x)+'%'}
+];
+M.forEach(m=>Object.defineProperty(m,'label',{get(){return m.l[lang==='es'?1:0];}}));
+const MM=Object.fromEntries(M.map(m=>[m.id,m]));
+
+function signals(n){
+ const c=C(n), moe=f=>f===1?'':L(', a change within the margin of error',', un cambio dentro del margen de error');
+ return [
+  {on:growth(c.hu)>growth(R.hu),t:L('Fast housing growth','Crecimiento rápido de vivienda'),d:L(`Housing stock grew ${fmt1(growth(c.hu))}%, compared with ${fmt1(growth(R.hu))}% for the region.`,`El número de viviendas creció ${fmt1(growth(c.hu))}%, comparado con ${fmt1(growth(R.hu))}% en la región.`)},
+  {on:c.renter[1]>c.renter[0]&&c.renter[2]===1,t:L('More renters','Más inquilinos'),d:L(`Renter share went from ${fmt1(c.renter[0])}% to ${fmt1(c.renter[1])}%`,`La proporción de inquilinos pasó de ${fmt1(c.renter[0])}% a ${fmt1(c.renter[1])}%`)+moe(c.renter[2])+'.'},
+  {on:c.rentburden[1]>c.rentburden[0]&&c.rentburden[2]===1,t:L('Renters under more strain','Inquilinos con más presión económica'),d:L(`Renters paying 30%+ of income went from ${fmt1(c.rentburden[0])}% to ${fmt1(c.rentburden[1])}%`,`Los inquilinos que pagan 30% o más de sus ingresos pasaron de ${fmt1(c.rentburden[0])}% a ${fmt1(c.rentburden[1])}%`)+moe(c.rentburden[2])+'.'},
+  {on:c.rentburden[1]>R.rentburden[1],t:L('Renter strain above the region','Presión sobre inquilinos mayor que en la región'),d:L(`${fmt1(c.rentburden[1])}% of renters are cost-strained, compared with ${fmt1(R.rentburden[1])}% regionwide.`,`${fmt1(c.rentburden[1])}% de los inquilinos tienen sobrecarga de costos, comparado con ${fmt1(R.rentburden[1])}% en la región.`)},
+  {on:c.vacancy[1]<c.vacancy[0]&&c.vacancy[2]===1,t:L('Tighter market','Mercado más ajustado'),d:L(`Vacancy went from ${fmt1(c.vacancy[0])}% to ${fmt1(c.vacancy[1])}%`,`La tasa de desocupación pasó de ${fmt1(c.vacancy[0])}% a ${fmt1(c.vacancy[1])}%`)+moe(c.vacancy[2])+'.'},
+  {on:c.income[2]<0,t:L('Incomes lost ground','Los ingresos perdieron terreno'),d:L(`After inflation, median household income went from ${money(c.income[0])} to ${money(c.income[1])} (${sgn(c.income[2])}%).`,`Ajustado por inflación, el ingreso medio del hogar pasó de ${money(c.income[0])} a ${money(c.income[1])} (${sgn(c.income[2])}%).`)},
+  {on:fcShare(n)>huShare(n),t:L('Future pressure','Presión futura'),d:L(`Forecast to absorb ${fmt1(fcShare(n))}% of the region's new households by 2035, while holding ${fmt1(huShare(n))}% of its homes today.`,`Se pronostica que absorberá ${fmt1(fcShare(n))}% de los nuevos hogares de la región para 2035, mientras hoy tiene ${fmt1(huShare(n))}% de sus viviendas.`)}
+ ];
+}
+const IND=[
+ {k:'hu',n:['Housing growth','Crecimiento de vivienda'],w:['Change in the total number of homes.','Cambio en el número total de viviendas.'],y:['Fast growth shows where development and investment are arriving, which often raises land values nearby.','Un crecimiento rápido muestra dónde llegan el desarrollo y la inversión, lo que a menudo eleva el valor del terreno cercano.']},
+ {k:'renter',n:['Renter share','Proporción de inquilinos'],w:['Share of occupied homes that are rented.','Proporción de viviendas ocupadas que se alquilan.'],y:['Georgia law does not limit rent increases, so a growing renter share means more households exposed to rising costs.','La ley de Georgia no limita los aumentos de alquiler, por eso una mayor proporción de inquilinos significa más hogares expuestos a costos crecientes.']},
+ {k:'rentburden',n:['Renters under cost strain','Inquilinos con sobrecarga de costos'],w:['Share of renters paying 30% or more of income on rent.','Proporción de inquilinos que pagan 30% o más de sus ingresos en alquiler.'],y:['These households have little room to absorb an increase. A rising share is one of the clearest signs of pressure.','Estos hogares tienen poco margen para absorber un aumento. Una proporción creciente es una de las señales más claras de presión.']},
+ {k:'costburden',n:['All households under cost strain','Todos los hogares con sobrecarga de costos'],w:['Share of all households paying 30% or more of income on housing.','Proporción de todos los hogares que pagan 30% o más de sus ingresos en vivienda.'],y:['If this falls while the renter figure rises, pressure is concentrating on renters.','Si esta cifra baja mientras la de inquilinos sube, la presión se concentra en los inquilinos.']},
+ {k:'vacancy',n:['Vacancy rate','Tasa de desocupación'],w:['Share of homes sitting empty.','Proporción de viviendas vacías.'],y:['Low vacancy means fewer open homes and more competition, which pushes rents and prices up.','Una baja desocupación significa menos viviendas disponibles y más competencia, lo que eleva alquileres y precios.']},
+ {k:'income',n:['Median household income','Ingreso medio del hogar'],w:['In 2024 dollars, adjusted for inflation.','En dólares de 2024, ajustado por inflación.'],y:['When incomes fall behind prices, the same rent takes a bigger bite of every paycheck.','Cuando los ingresos se quedan atrás de los precios, el mismo alquiler consume una parte mayor de cada sueldo.']},
+ {k:'poverty',n:['Poverty rate','Tasa de pobreza'],w:['Share of people below the federal poverty line.','Proporción de personas por debajo del nivel federal de pobreza.'],y:['Households in poverty have the fewest options when costs rise.','Los hogares en pobreza tienen menos opciones cuando suben los costos.']},
+ {k:'unemp',n:['Unemployment rate','Tasa de desempleo'],w:['Share of the civilian labor force without a job.','Proporción de la fuerza laboral civil sin empleo.'],y:['Job loss is a common trigger for missed rent and eviction.','La pérdida de empleo es una causa común de alquileres atrasados y desalojos.']},
+ {k:'novehicle',n:['Households without a car','Hogares sin automóvil'],w:['Share of households with no vehicle.','Proporción de hogares sin vehículo.'],y:['These households depend on transit and nearby jobs. Being pushed to car-dependent areas hits them hardest.','Estos hogares dependen del transporte público y de empleos cercanos. Ser desplazados a zonas que dependen del automóvil los afecta más.']}
+];
+const I=(o,f)=>o[f][lang==='es'?1:0];
+const TYPES=[['Big rent increase at renewal','Gran aumento de alquiler al renovar'],['Building or homes sold to new owners','Edificio o casas vendidos a nuevos dueños'],['Cash offers to move out','Ofertas de dinero para mudarse'],['Repairs ignored or delayed','Reparaciones ignoradas o atrasadas'],['Neighbors moving out','Vecinos que se mudan'],['Eviction notices','Avisos de desalojo'],['New development or rezoning','Nuevos desarrollos o cambios de zonificación'],['Local businesses closing','Cierre de negocios locales'],['Property taxes rising sharply','Fuerte aumento de impuestos a la propiedad'],['Something else','Otra cosa']];
+const WHEN=[['In the last month','En el último mes'],['In the last 3 months','En los últimos 3 meses'],['In the last year','En el último año'],['More than a year ago','Hace más de un año']];
+const ROLE=[['Renter','Inquilino'],['Homeowner','Propietario de vivienda'],['Community organization or nonprofit','Organización comunitaria o sin fines de lucro'],['Local official or staff','Funcionario o personal local'],['Other','Otro']];
+const METHOD_SIG=[
+ ['<b>Fast housing growth:</b> the county\u2019s housing stock grew faster than the region\u2019s from 2010 to 2024.','<b>Crecimiento rápido de vivienda:</b> el número de viviendas del condado creció más rápido que el de la región de 2010 a 2024.'],
+ ['<b>More renters:</b> the renter share of homes rose, and the change is statistically significant.','<b>Más inquilinos:</b> la proporción de viviendas alquiladas aumentó y el cambio es estadísticamente significativo.'],
+ ['<b>Renters under more strain:</b> the share of renters paying 30% or more of income on rent rose significantly.','<b>Inquilinos con más presión económica:</b> la proporción de inquilinos que pagan 30% o más de sus ingresos en alquiler aumentó de forma significativa.'],
+ ['<b>Renter strain above the region:</b> that share is higher than the regional figure in 2024.','<b>Presión sobre inquilinos mayor que en la región:</b> esa proporción es mayor que la cifra regional en 2024.'],
+ ['<b>Tighter market:</b> the vacancy rate fell significantly, leaving fewer open homes.','<b>Mercado más ajustado:</b> la tasa de desocupación bajó de forma significativa, dejando menos viviendas disponibles.'],
+ ['<b>Incomes lost ground:</b> median household income fell after adjusting for inflation.','<b>Los ingresos perdieron terreno:</b> el ingreso medio del hogar bajó después de ajustar por inflación.'],
+ ['<b>Future pressure:</b> the county is forecast to absorb a larger share of the region\u2019s 2035 household growth than its share of today\u2019s homes.','<b>Presión futura:</b> se pronostica que el condado absorberá una parte del crecimiento de hogares de 2035 mayor que su parte de las viviendas actuales.']];
+const METHOD_DATA=[
+ ['County figures come from American Community Survey 5-year estimates for 2006\u20132010 and 2020\u20132024, compiled by the Atlanta Regional Commission, which also supplies the significance flags (90% confidence).','Las cifras de los condados provienen de las estimaciones de 5 años de la Encuesta sobre la Comunidad Estadounidense para 2006\u20132010 y 2020\u20132024, compiladas por la Comisión Regional de Atlanta, que también indica qué cambios son significativos (90% de confianza).'],
+ ['Incomes are converted to 2024 dollars using the Consumer Price Index (CPI-U annual averages: 218.056 for 2010 and 313.689 for 2024). ARC\u2019s significance flags apply to the unadjusted change, so none is shown for the adjusted figure.','Los ingresos se convierten a dólares de 2024 con el Índice de Precios al Consumidor (promedios anuales del CPI-U: 218.056 para 2010 y 313.689 para 2024). Las indicaciones de significancia de la ARC se refieren al cambio sin ajustar, por lo que no se muestra ninguna para la cifra ajustada.'],
+ ['Regional figures combine all 11 counties\u2019 counts. A regional median income cannot be built from county medians, so none is shown.','Las cifras regionales combinan los conteos de los 11 condados. No se puede calcular un ingreso medio regional a partir de las medianas de los condados, por eso no se muestra.'],
+ ['Counties are large. Pressure is often concentrated in neighborhoods that a county average hides.','Los condados son grandes. La presión suele concentrarse en vecindarios que el promedio del condado oculta.'],
+ ['Median rent and home value come from the 2020\u20132024 ACS via Census QuickFacts. Income needed to afford rent uses the 30%-of-income guideline.','El alquiler mediano y el valor de la vivienda provienen de la ACS 2020\u20132024 a través de Census QuickFacts. El ingreso necesario para pagar el alquiler usa la pauta del 30% del ingreso.'],
+ ['County boundaries: U.S. Census Bureau cartographic boundary files.','Límites de los condados: archivos cartográficos de la Oficina del Censo de EE. UU.']];
+const METHOD_NEXT=[
+ [['Neighborhood (census tract) map','Mapa por vecindario (sector censal)'],['Shows where within a county pressure is concentrated','Muestra en qué partes de un condado se concentra la presión']],
+ [['Rent and home value trends since 2010','Tendencias de alquiler y valor de vivienda desde 2010'],['The rent map shows 2020\u20132024 levels. Adding 2006\u20132010 figures will show how fast costs rose in each county','El mapa de alquileres muestra los niveles de 2020\u20132024. Agregar las cifras de 2006\u20132010 mostrará qué tan rápido subieron los costos en cada condado']],
+ [['Eviction filing rates','Tasas de demandas de desalojo'],["From ARC's eviction tracker for the five core counties (not available for Forsyth)",'Del rastreador de desalojos de la ARC para los cinco condados centrales (no disponible para Forsyth)']],
+ [['Testing the signals','Probar las señales'],['Checking which signals match places that actually changed from 2000 to 2019, before any risk categories are created','Verificar qué señales coinciden con los lugares que realmente cambiaron entre 2000 y 2019, antes de crear categorías de riesgo']]];
+
+const SVGNS='http://www.w3.org/2000/svg';
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const[a,v]of Object.entries(attrs))e.setAttribute(a,v);if(text!==undefined)e.textContent=text;return e;}
+function s(tag,attrs={},text){const e=document.createElementNS(SVGNS,tag);for(const[a,v]of Object.entries(attrs))e.setAttribute(a,v);if(text!==undefined)e.textContent=text;return e;}
+const tip=document.getElementById('tip');
+function showTip(ev,text){tip.textContent=text;tip.style.opacity=1;tip.style.left=Math.min(ev.clientX+14,innerWidth-250)+'px';tip.style.top=(ev.clientY+14)+'px';}
+function hideTip(){tip.style.opacity=0;}
+function fillSelect(sel,items,val){sel.replaceChildren();items.forEach(([v,l])=>sel.append(el('option',{value:v},l)));if(val!==undefined)sel.value=val;}
+
+let current='Forsyth'; try{const v=localStorage.getItem('county');if(v&&DATA.counties[v])current=v;}catch(e){}
+function setCounty(n){current=n;try{localStorage.setItem('county',n)}catch(e){};renderAll();}
+
+function applyStatic(){
+ document.documentElement.lang=lang;
+ document.querySelectorAll('[data-t]').forEach(e=>{e.innerHTML=T(e.dataset.t);});
+ document.getElementById('langNote').style.display=lang==='es'?'block':'none';
+ const b=document.getElementById('langBtn'); b.textContent=lang==='es'?'English':'Español'; b.setAttribute('lang',lang==='es'?'en':'es'); b.setAttribute('aria-label',lang==='es'?'Switch to English':'Cambiar a español');
+ document.getElementById('mapsvg').setAttribute('aria-label',L('Map of the 11-county Atlanta region','Mapa de la región de Atlanta de 11 condados'));
+ document.getElementById('mSignals').innerHTML=METHOD_SIG.map(x=>'<li>'+x[lang==='es'?1:0]+'</li>').join('');
+ document.getElementById('mData').innerHTML=METHOD_DATA.map(x=>'<li>'+x[lang==='es'?1:0]+'</li>').join('');
+ const nb=document.getElementById('mNext'); nb.replaceChildren(); METHOD_NEXT.forEach(([a,b])=>{const r=el('tr');r.append(el('td',{},a[lang==='es'?1:0]),el('td',{style:'text-align:left;white-space:normal'},b[lang==='es'?1:0]));nb.append(r);});
+ const opts=NAMES.map(n=>[n,cn(n)]);
+ fillSelect(document.getElementById('countySel'),opts,current); fillSelect(document.getElementById('heroSel'),opts,current);
+ const mopts=M.map(m=>[m.id,m.label]);
+ fillSelect(document.getElementById('mapMetric'),mopts,mapMetric); fillSelect(document.getElementById('rankMetric'),mopts,rankMetric); fillSelect(document.getElementById('xMetric'),mopts,xM); fillSelect(document.getElementById('yMetric'),mopts,yM);
+ const fc=document.getElementById('fCounty'), keep=fc.value||current; fillSelect(fc,opts.concat([['Other',L('Another county','Otro condado')]]),keep);
+ const fw=document.getElementById('fWhen'),kw=fw.value; fillSelect(fw,WHEN.map(x=>[x[0],x[lang==='es'?1:0]]),kw||WHEN[0][0]);
+ const fr=document.getElementById('fRole'),kr=fr.value; fillSelect(fr,ROLE.map(x=>[x[0],x[lang==='es'?1:0]]),kr||ROLE[0][0]);
+ const box=document.getElementById('fTypes'); const checked=new Set([...box.querySelectorAll('input:checked')].map(x=>x.value)); box.replaceChildren();
+ TYPES.forEach((t,i)=>{const l=el('label');const c=el('input',{type:'checkbox',value:t[0],id:'ft'+i});if(checked.has(t[0]))c.checked=true;l.append(c,document.createTextNode(t[lang==='es'?1:0]));box.append(l);});
+}
+
+function renderOverview(){
+ const c=C(current),sig=signals(current),on=sig.filter(x=>x.on).length,added=(c.hu[1]-c.hu[0]).toLocaleString('en-US');
+ document.getElementById('lede').textContent=L(`${cn(current)} added ${added} homes since 2010, a ${fmt1(growth(c.hu))}% increase. ${fmt1(c.rentburden[1])}% of renters now spend 30% or more of their income on rent, and ${on} of 7 early warning signals are present.`,
+  `El ${cn(current)} sumó ${added} viviendas desde 2010, un aumento de ${fmt1(growth(c.hu))}%. Hoy, ${fmt1(c.rentburden[1])}% de los inquilinos gastan 30% o más de sus ingresos en alquiler, y ${on} de 7 señales de alerta están presentes.`);
+ const st=document.getElementById('stats');st.replaceChildren();
+ [[L(`${on} of 7`,`${on} de 7`),L('early warning signals present','señales de alerta presentes')],[money(c.rent[0]),L('median monthly rent, 2020\u201324','alquiler mensual mediano, 2020\u201324')],[fmt1(c.rentburden[1])+'%',L('of renters under cost strain','de inquilinos con sobrecarga de costos')],[sgn(c.income[2])+'%',L('real income change since 2010','cambio real del ingreso desde 2010')]]
+  .forEach(([v,l])=>{const d=el('div',{class:'stat'});d.append(el('div',{class:'v'},v),el('div',{class:'l'},l));st.append(d);});
+ const fell=NAMES.filter(n=>C(n).income[2]<0).length;
+ document.getElementById('regionFinding').textContent=L(`From 2010 to 2024, the share of all households paying 30% or more of income on housing fell from ${fmt1(R.costburden[0])}% to ${fmt1(R.costburden[1])}%. Over the same period, the share of renters paying that much rose from ${fmt1(R.rentburden[0])}% to ${fmt1(R.rentburden[1])}%. After inflation, median income fell in ${fell} of the 11 counties.`,
+  `De 2010 a 2024, la proporción de todos los hogares que pagan 30% o más de sus ingresos en vivienda bajó de ${fmt1(R.costburden[0])}% a ${fmt1(R.costburden[1])}%. En el mismo período, la proporción de inquilinos que pagan esa cantidad subió de ${fmt1(R.rentburden[0])}% a ${fmt1(R.rentburden[1])}%. Ajustado por inflación, el ingreso medio bajó en ${fell} de los 11 condados.`);
+ const box=document.getElementById('sigrank');box.replaceChildren();
+ NAMES.map(n=>({n,k:signals(n).filter(x=>x.on).length})).sort((a,b)=>b.k-a.k||a.n.localeCompare(b.n)).forEach(r=>{
+  const b=el('button',{type:'button',class:'srow'+(r.n===current?' me':''),'aria-label':L(`${r.n}: ${r.k} of 7 signals`,`${r.n}: ${r.k} de 7 señales`)});
+  const dots=el('span',{class:'dots','aria-hidden':'true'});for(let i=0;i<7;i++)dots.append(el('i',{class:i<r.k?'on':''}));
+  b.append(el('span',{class:'nm'},r.n),dots,el('span',{class:'ct'},L(`${r.k} of 7`,`${r.k} de 7`)));
+  b.addEventListener('click',()=>setCounty(r.n)); box.append(b);});
+}
+
+const geo=DATA.geo; let mapMetric='rb';
+(function(){let a=1e9,b=-1e9,c=1e9,d=-1e9;const rings=f=>f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;
+ geo.features.forEach(f=>rings(f).forEach(p=>p.forEach(r=>r.forEach(([x,y])=>{a=Math.min(a,x);b=Math.max(b,x);c=Math.min(c,y);d=Math.max(d,y);}))));
+ const k=Math.cos((c+d)/2*Math.PI/180),W=600,sc=W/((b-a)*k);geo.W=W;geo.H=Math.ceil((d-c)*sc);
+ const P=([x,y])=>[((x-a)*k*sc).toFixed(1),((d-y)*sc).toFixed(1)];
+ geo.features.forEach(f=>{let path='',ax=0,ay=0,cnt=0;rings(f).forEach(p=>p.forEach((r,ri)=>{path+='M'+r.map(P).map(q=>q.join(',')).join('L')+'Z';if(ri===0)r.forEach(pt=>{const q=P(pt);ax+=+q[0];ay+=+q[1];cnt++;});}));f.d=path;f.cx=ax/cnt;f.cy=ay/cnt;});})();
+const CLS=[0.14,0.32,0.5,0.7,0.92];
+function choro(svgId,keyId,m,color,showVal){
+ const vals=NAMES.map(m.get),lo=Math.min(...vals),hi=Math.max(...vals),step=(hi-lo)/5||1,cls=v=>Math.min(4,Math.floor((v-lo)/step));
+ const svg=document.getElementById(svgId);svg.setAttribute('viewBox',`-6 -6 ${geo.W+12} ${geo.H+12}`);svg.replaceChildren();
+ const order=[...geo.features].sort((x,y)=>(x.properties.name===current)-(y.properties.name===current));
+ order.forEach(f=>{const n=f.properties.name,v=m.get(n);
+  const p=s('path',{d:f.d,fill:color,'fill-opacity':CLS[cls(v)],tabindex:0,role:'button','aria-label':`${cn(n)}, ${m.label}: ${m.f(v)}`,class:n===current?'sel':''});
+  p.addEventListener('mousemove',ev=>showTip(ev,`${n}: ${m.f(v)}`));p.addEventListener('mouseleave',hideTip);p.addEventListener('click',()=>setCounty(n));
+  p.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setCounty(n);}});svg.append(p);});
+ geo.features.forEach(f=>{const n=f.properties.name,t=s('text',{x:f.cx,y:showVal?f.cy-2:f.cy+4,'text-anchor':'middle',fill:'var(--ink)'},n);
+  if(showVal)t.append(s('tspan',{x:f.cx,dy:13,class:'v'},m.f(m.get(n))));svg.append(t);});
+ const k=document.getElementById(keyId);k.replaceChildren();
+ CLS.forEach((o,i)=>{const sw=el('div',{class:'sw'}),sq=el('i');sq.style.background=color;sq.style.opacity=o;sw.append(sq,el('span',{},i===0||i===4||i===2?m.f(lo+step*i)+(i===4?'+':''):''));k.append(sw);});
+}
+function renderHero(){
+ const svg=document.getElementById('heromap');svg.setAttribute('viewBox',`-6 -6 ${geo.W+12} ${geo.H+12}`);svg.replaceChildren();
+ svg.setAttribute('aria-label',L('Map of the 11-county Atlanta region','Mapa de la región de Atlanta de 11 condados'));
+ const order=[...geo.features].sort((x,y)=>(x.properties.name===current)-(y.properties.name===current));
+ order.forEach(f=>{const n=f.properties.name,p=s('path',{d:f.d,class:n===current?'sel':'',tabindex:0,role:'button','aria-label':cn(n)});
+  p.addEventListener('click',()=>setCounty(n));p.addEventListener('keydown',ev=>{if(ev.key==='Enter'||ev.key===' '){ev.preventDefault();setCounty(n);}});svg.append(p);});
+ geo.features.forEach(f=>{const n=f.properties.name;svg.append(s('text',{x:f.cx,y:f.cy+4,'text-anchor':'middle',class:n===current?'sel':''},n));});
+}
+function renderMap(){
+ const m=MM[mapMetric];choro('mapsvg','mapKey',m,'var(--pine)',false);
+ const d=document.getElementById('mapDetail');d.replaceChildren();const rank=[...NAMES].sort((a,b)=>m.get(b)-m.get(a)).indexOf(current)+1,rg=m.reg();
+ d.append(el('h3',{},cn(current)),el('div',{class:'big'},m.f(m.get(current))),el('div',{class:'sub'},L(`${m.label}. Ranks ${rank} of 11 (highest first).`,`${m.label}. Ocupa el lugar ${rank} de 11 (de mayor a menor).`)+(rg!==null?L(' Region: ',' Región: ')+m.f(rg)+'.':'')));
+ const tb=el('table');['rb','renter','growth','rent','incCh','vac','pov'].forEach(id=>{const mm=MM[id],tr=el('tr');tr.append(el('td',{},mm.label),el('td',{},mm.f(mm.get(current))));tb.append(tr);});
+ d.append(tb,el('a',{href:'#profile',class:'linkbtn'},L('See the full county profile','Ver el perfil completo del condado')));
+}
+let rentMetric='rent';
+function renderRent(){
+ const seg=document.getElementById('rentSeg');seg.replaceChildren();seg.setAttribute('aria-label',T('show'));
+ ['rent','need','val','vti'].forEach(id=>{const b=el('button',{type:'button','aria-pressed':String(id===rentMetric)},MM[id].s[lang==='es'?1:0]);b.addEventListener('click',()=>{rentMetric=id;renderRent();});seg.append(b);});
+ const m=MM[rentMetric];document.getElementById('rentsvg').setAttribute('aria-label',L('Map of ','Mapa de ')+m.label);
+ choro('rentsvg','rentKey',m,'var(--amber)',true);
+ const c=C(current),need=c.rent[0]*12/0.3,inc=c.income[1],rank=[...NAMES].sort((a,b)=>m.get(b)-m.get(a)).indexOf(current)+1;
+ const d=document.getElementById('rentDetail');d.replaceChildren();
+ d.append(el('h3',{},cn(current)),el('div',{class:'big'},m.f(m.get(current))),el('div',{class:'sub'},L(`${m.label}. Ranks ${rank} of 11 (highest first).`,`${m.label}. Ocupa el lugar ${rank} de 11 (de mayor a menor).`)));
+ const tb=el('table');[[L('Median rent per month','Alquiler mediano mensual'),money(c.rent[0])],[L('Income needed to afford it','Ingreso necesario para pagarlo'),money(need)+L(' / yr',' / año')],[L('Full-time hourly wage needed','Salario por hora necesario (tiempo completo)'),'$'+(need/2080).toFixed(2)],[L('Median household income','Ingreso medio del hogar'),money(inc)],[L('Median home value','Valor mediano de la vivienda'),money(c.rent[1])],[L('Home value to income','Valor de vivienda/ingreso'),fmt1(c.rent[1]/inc)+'\u00d7']]
+  .forEach(([a,b])=>{const tr=el('tr');tr.append(el('td',{},a),el('td',{},b));tb.append(tr);});
+ const co=el('div',{class:'callout'});co.append(el('b',{},money(need)+L(' a year',' al año')),document.createTextNode(L(`is what a household in ${cn(current)} needs to rent the median home without spending more than 30% of its income. That equals ${Math.round(need/inc*100)}% of the county\u2019s median household income.`,`es lo que necesita un hogar en el ${cn(current)} para alquilar la vivienda mediana sin gastar más del 30% de su ingreso. Equivale al ${Math.round(need/inc*100)}% del ingreso medio del hogar del condado.`)));
+ d.append(tb,co);
+ barChart(document.getElementById('rentrank'),NAMES.map(n=>({n,v:m.get(n)})).sort((a,b)=>b.v-a.v),null,current,m.f,m.label,'var(--amber)');
+}
+function renderCost(){
+ const c=C(current),need=c.rent[0]*12/0.3,box=document.getElementById('costrow');box.replaceChildren();
+ [[money(c.rent[0]),L('median monthly rent','alquiler mensual mediano')],[money(need),L('income needed to afford that rent','ingreso necesario para pagar ese alquiler')],[money(c.rent[1]),L('median home value','valor mediano de la vivienda')],[fmt1(c.rent[1]/c.income[1])+'\u00d7',L('home value to median income','valor de vivienda frente al ingreso medio')]]
+  .forEach(([v,l])=>{const d=el('div',{class:'stat'});d.append(el('div',{class:'v'},v),el('div',{class:'l'},l));box.append(d);});
+}
+
+function renderProfile(){
+ document.getElementById('h-profile').textContent=L(`${cn(current)} profile`,`Perfil del ${cn(current)}`);
+ const sig=signals(current),on=sig.filter(x=>x.on);
+ document.getElementById('sigsum').textContent=on.length?L(`${on.length} of 7 signals are present: `,`${on.length} de 7 señales están presentes: `)+on.map(x=>x.t.toLowerCase()).join(', ')+'.':L('None of the 7 signals are present.','Ninguna de las 7 señales está presente.');
+ const ul=document.getElementById('siglist');ul.replaceChildren();
+ sig.forEach(x=>{const li=el('li',{class:'signal'+(x.on?' on':'')});li.append(el('span',{class:'mark','aria-hidden':'true'}),el('div',{class:'t'},x.t),el('div',{class:'d'},x.d));li.append(el('span',{class:'sr'},x.on?L(' (present)',' (presente)'):L(' (not present)',' (no presente)')));ul.append(li);});
+ const box=document.getElementById('indlist');box.replaceChildren();const c=C(current);
+ IND.forEach(ind=>{const row=el('div',{class:'ind'}),Lf=el('div'),Rt=el('div');
+  Lf.append(el('h3',{},I(ind,'n')),el('p',{class:'what'},I(ind,'w')),el('p',{class:'why'},I(ind,'y')));
+  const nums=el('div',{class:'nums'});let badge;
+  if(ind.k==='hu'){nums.append(el('span',{class:'now'},'+'+fmt1(growth(c.hu))+'%'),el('span',{class:'was'},L(`${c.hu[0].toLocaleString('en-US')} to ${c.hu[1].toLocaleString('en-US')} homes`,`de ${c.hu[0].toLocaleString('en-US')} a ${c.hu[1].toLocaleString('en-US')} viviendas`)));badge=c.hu[2];}
+  else if(ind.k==='income'){const[a,b]=c.income;nums.append(el('span',{class:'now'},money(b)),el('span',{class:'was'},L(`from ${money(a)} in 2010, in 2024 dollars (${sgn(c.income[2])}%)`,`desde ${money(a)} en 2010, en dólares de 2024 (${sgn(c.income[2])}%)`)));badge=null;}
+  else{const v=c[ind.k],[a,b]=v;nums.append(el('span',{class:'now'},fmt1(b)+'%'),el('span',{class:'was'},L(`from ${fmt1(a)}% in 2010 (${pts(b-a)})`,`desde ${fmt1(a)}% en 2010 (${pts(b-a)})`)));badge=v[2];}
+  Rt.append(nums,badge===null?el('span',{class:'badge noise'},L('Inflation-adjusted; no significance test','Ajustado por inflación; sin prueba de significancia')):el('span',{class:'badge'+(badge===1?'':' noise')},badge===1?L('Significant change','Cambio significativo'):L('Within margin of error','Dentro del margen de error')));
+  Rt.append(dumbbell(ind.k,c));row.append(Lf,Rt);box.append(row);});
+}
+function dumbbell(k,c){
+ const W=460,H=64,Lx=10,Rr=450,svg=s('svg',{viewBox:`0 0 ${W} ${H}`,class:'dumb',role:'img'});let all,cur,reg,lab;
+ if(k==='hu'){all=NAMES.map(n=>growth(C(n).hu));cur=[null,growth(c.hu)];reg=growth(R.hu);lab=v=>fmt1(v)+'%';}
+ else if(k==='income'){all=NAMES.flatMap(n=>C(n).income.slice(0,2));cur=c.income.slice(0,2);reg=null;lab=money;}
+ else{all=NAMES.flatMap(n=>C(n)[k].slice(0,2));cur=c[k].slice(0,2);reg=R[k]?R[k][1]:null;lab=v=>fmt1(v)+'%';}
+ const max=Math.max(...all,reg||0)*1.08,x=v=>Lx+v/max*(Rr-Lx);
+ svg.append(s('line',{x1:Lx,x2:Rr,y1:30,y2:30,stroke:'var(--line)','stroke-width':2}));
+ if(reg!==null){svg.append(s('line',{x1:x(reg),x2:x(reg),y1:14,y2:46,stroke:'var(--river)','stroke-width':2,'stroke-dasharray':'3 3'}),s('text',{x:x(reg),y:60,'text-anchor':'middle','font-size':12,fill:'var(--river)'},L('Region ','Región ')+lab(reg)));}
+ if(k==='hu')svg.append(s('rect',{x:Lx,y:24,width:Math.max(2,x(cur[1])-Lx),height:12,fill:'var(--pine)'}));
+ else svg.append(s('line',{x1:x(cur[0]),x2:x(cur[1]),y1:30,y2:30,stroke:'var(--bar)','stroke-width':6,'stroke-linecap':'round'}),s('circle',{cx:x(cur[0]),cy:30,r:7,fill:'var(--surface)',stroke:'var(--muted)','stroke-width':2}),s('circle',{cx:x(cur[1]),cy:30,r:8,fill:'var(--pine)'}));
+ svg.setAttribute('aria-label',k==='hu'?lab(cur[1]):`2010 ${lab(cur[0])}, 2024 ${lab(cur[1])}`+(reg!==null?L(', region ',', región ')+lab(reg):''));
+ const w=el('div');w.append(svg);const lg=el('div',{class:'legend'});
+ if(k!=='hu')lg.insertAdjacentHTML('beforeend','<span><i style="background:var(--surface);border:2px solid var(--muted)"></i>2010</span><span><i style="background:var(--pine)"></i>2024</span>');
+ if(reg!==null)lg.insertAdjacentHTML('beforeend',`<span><i style="background:var(--river)"></i>${k==='hu'?L('Region growth','Crecimiento regional'):L('Region, 2024','Región, 2024')}</span>`);
+ w.append(lg);return w;
+}
+
+let rankMetric='rb',xM='growth',yM='rbCh',sortKey='rb',sortDir=-1;
+function barChart(box,rows,ref,hl,lab,title,hc){
+ const W=760,top=40,rowH=30,Lx=110,Rr=660,H=top+rows.length*rowH+30,vals=rows.map(r=>r.v).concat(ref==null?[]:[ref]),lo=Math.min(0,...vals),hi=Math.max(0,...vals),x=v=>Lx+(v-lo)/((hi-lo)||1)*(Rr-Lx);
+ const svg=s('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':title});svg.append(s('text',{x:0,y:20,'font-size':15,'font-weight':600,fill:'var(--ink)'},title));
+ if(lo<0)svg.append(s('line',{x1:x(0),x2:x(0),y1:top-4,y2:top+rows.length*rowH,stroke:'var(--muted)'}));
+ if(ref!=null)svg.append(s('line',{x1:x(ref),x2:x(ref),y1:top-4,y2:top+rows.length*rowH,stroke:'var(--river)','stroke-width':2,'stroke-dasharray':'4 3'}),s('text',{x:x(ref),y:top+rows.length*rowH+18,'text-anchor':'middle','font-size':12,fill:'var(--river)'},L('Region ','Región ')+lab(ref)));
+ rows.forEach((r,i)=>{const y=top+i*rowH,me=r.n===hl,x0=x(Math.min(0,r.v)),x1=x(Math.max(0,r.v));
+  const t=s('text',{x:Lx-10,y:y+17,'text-anchor':'end','font-size':14,'font-weight':me?700:400,fill:'var(--ink)',style:'cursor:pointer'},r.n);t.addEventListener('click',()=>setCounty(r.n));svg.append(t);
+  const b=s('rect',{x:x0,y:y+5,width:Math.max(2,x1-x0),height:18,fill:me?(hc||'var(--pine)'):'var(--bar)',style:'cursor:pointer'});b.addEventListener('click',()=>setCounty(r.n));b.addEventListener('mousemove',ev=>showTip(ev,`${r.n}: ${lab(r.v)}`));b.addEventListener('mouseleave',hideTip);svg.append(b);
+  svg.append(s('text',{x:r.v>=0?x1+6:x0-6,y:y+18,'text-anchor':r.v>=0?'start':'end','font-size':13,fill:'var(--muted)',stroke:'var(--paper)','stroke-width':4,'paint-order':'stroke'},lab(r.v)));});
+ box.replaceChildren(svg);
+}
+function renderCompare(){
+ const m=MM[rankMetric];barChart(document.getElementById('rankchart'),NAMES.map(n=>({n,v:m.get(n)})).sort((a,b)=>b.v-a.v),m.reg(),current,m.f,m.label);
+ const X=MM[xM],Y=MM[yM],W=760,H=440,Lx=100,Rr=730,Tp=20,B=380,xs=NAMES.map(X.get),ys=NAMES.map(Y.get);
+ const pad=a=>{const lo=Math.min(...a),hi=Math.max(...a),p=(hi-lo)*0.12||1;return[lo-p,hi+p];};
+ const[xl,xh]=pad(xs),[yl,yh]=pad(ys),sx=v=>Lx+(v-xl)/(xh-xl)*(Rr-Lx),sy=v=>B-(v-yl)/(yh-yl)*(B-Tp);
+ const svg=s('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`${Y.label} / ${X.label}`});
+ for(let i=0;i<=4;i++){const vx=xl+(xh-xl)*i/4,vy=yl+(yh-yl)*i/4;
+  svg.append(s('line',{x1:sx(vx),x2:sx(vx),y1:Tp,y2:B,stroke:'var(--line)'}),s('text',{x:sx(vx),y:B+18,'text-anchor':'middle','font-size':12,fill:'var(--muted)'},X.f(vx)),s('line',{x1:Lx,x2:Rr,y1:sy(vy),y2:sy(vy),stroke:'var(--line)'}),s('text',{x:Lx-8,y:sy(vy)+4,'text-anchor':'end','font-size':12,fill:'var(--muted)'},Y.f(vy)));}
+ svg.append(s('text',{x:(Lx+Rr)/2,y:B+44,'text-anchor':'middle','font-size':14,'font-weight':600,fill:'var(--ink)'},X.label),s('text',{x:16,y:(Tp+B)/2,'text-anchor':'middle','font-size':14,'font-weight':600,fill:'var(--ink)',transform:`rotate(-90 16 ${(Tp+B)/2})`},Y.label));
+ const placed=[];
+ NAMES.forEach(n=>{const me=n===current,cx=sx(X.get(n)),cy=sy(Y.get(n));
+  const c=s('circle',{cx,cy,r:me?9:7,fill:me?'var(--amber)':'var(--pine)','fill-opacity':me?1:0.75,stroke:'var(--surface)','stroke-width':2,style:'cursor:pointer',tabindex:0,role:'button','aria-label':`${n}: ${X.f(X.get(n))}, ${Y.f(Y.get(n))}`});
+  c.addEventListener('mousemove',ev=>showTip(ev,`${n}: ${X.f(X.get(n))}, ${Y.f(Y.get(n))}`));c.addEventListener('mouseleave',hideTip);c.addEventListener('click',()=>setCounty(n));c.addEventListener('keydown',ev=>{if(ev.key==='Enter')setCounty(n);});
+  svg.append(c);placed.push({n,cx,cy,me});});
+ placed.sort((a,b)=>a.cy-b.cy);const used=[];
+ placed.forEach(pl=>{let ly=pl.cy+4,w=pl.n.length*7+4,tries=0;while(used.some(u=>Math.abs(u.y-ly)<14&&pl.cx+11<u.x+u.w&&u.x<pl.cx+11+w)&&tries<6){ly+=14;tries++;}used.push({x:pl.cx+11,y:ly,w});
+  svg.append(s('text',{x:pl.cx+11,y:ly,'font-size':12,'font-weight':pl.me?700:500,fill:'var(--ink)',stroke:'var(--paper)','stroke-width':3,'paint-order':'stroke'},pl.n));});
+ document.getElementById('scatter').replaceChildren(svg);renderTable();
+}
+function renderTable(){
+ const cols=['rb','rbCh','renter','growth','rent','val','vac','incCh','inc','pov','unemp','fc'],rows=[...NAMES].sort((a,b)=>(MM[sortKey].get(a)-MM[sortKey].get(b))*sortDir);
+ const t=el('table',{class:'data'}),th=el('thead'),tr=el('tr');tr.append(el('th',{},L('County','Condado')));
+ cols.forEach(id=>{const h=el('th'),b=el('button',{type:'button'},MM[id].label);if(sortKey===id)b.setAttribute('aria-sort',sortDir<0?'descending':'ascending');b.addEventListener('click',()=>{if(sortKey===id)sortDir*=-1;else{sortKey=id;sortDir=-1;}renderTable();});h.append(b);tr.append(h);});
+ th.append(tr);t.append(th);const tb=el('tbody');
+ rows.forEach(n=>{const r=el('tr',{class:n===current?'me':''});r.append(el('td',{},n));cols.forEach(id=>r.append(el('td',{},MM[id].f(MM[id].get(n)))));tb.append(r);});
+ const rr=el('tr');rr.append(el('td',{style:'color:var(--muted)'},L('Region','Región')));cols.forEach(id=>{const v=MM[id].reg();rr.append(el('td',{style:'color:var(--muted)'},v==null?L('n/a','n/d'):MM[id].f(v)));});tb.append(rr);
+ t.append(tb);document.getElementById('tablewrap').replaceChildren(t);
+}
+function renderFuture(){
+ barChart(document.getElementById('fcchart'),NAMES.map(n=>({n,v:C(n).forecast})).sort((a,b)=>b.v-a.v),null,current,v=>'+'+v+',000',L('Forecast new households, 2020 to 2035','Nuevos hogares pronosticados, 2020 a 2035'));
+ const rows=[...NAMES].sort((a,b)=>(fcShare(b)-huShare(b))-(fcShare(a)-huShare(a))),W=760,top=44,rowH=32,Lx=110,Rr=700,H=top+rows.length*rowH+20,max=Math.max(...NAMES.map(fcShare),...NAMES.map(huShare))*1.1,x=v=>Lx+v/max*(Rr-Lx);
+ const svg=s('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':T('share_h')});
+ svg.append(s('circle',{cx:Lx,cy:16,r:6,fill:'var(--muted)'}),s('text',{x:Lx+12,y:20,'font-size':13,fill:'var(--muted)'},L('Share of region\u2019s homes today','Parte de las viviendas de la región hoy')),s('circle',{cx:Lx+280,cy:16,r:6,fill:'var(--amber)'}),s('text',{x:Lx+292,y:20,'font-size':13,fill:'var(--muted)'},L('Share of forecast growth to 2035','Parte del crecimiento pronosticado a 2035')));
+ rows.forEach((n,i)=>{const y=top+i*rowH+12,a=huShare(n),b=fcShare(n),me=n===current;
+  svg.append(s('text',{x:Lx-10,y:y+5,'text-anchor':'end','font-size':14,'font-weight':me?700:400,fill:'var(--ink)'},n),s('line',{x1:x(a),x2:x(b),y1:y,y2:y,stroke:b>a?'var(--amber)':'var(--bar)','stroke-width':4,'stroke-opacity':0.5}),s('circle',{cx:x(a),cy:y,r:6,fill:'var(--muted)'}),s('circle',{cx:x(b),cy:y,r:me?8:6,fill:'var(--amber)'}),s('text',{x:Math.max(x(a),x(b))+12,y:y+5,'font-size':12,fill:'var(--muted)'},`${fmt1(a)}% \u2192 ${fmt1(b)}%`));});
+ document.getElementById('sharechart').replaceChildren(svg);
+}
+
+let db=null,reportDocs=null,dbState='loading';
+function setupForm(){
+ document.getElementById('reportForm').addEventListener('submit',async ev=>{
+  ev.preventDefault();const st=document.getElementById('fStatus'),btn=document.getElementById('fSubmit'),box=document.getElementById('fTypes');
+  const types=[...box.querySelectorAll('input:checked')].map(x=>x.value),show=(cls,msg)=>{st.className='status show '+cls;st.textContent=msg;};
+  if(!types.length){show('err',L('Choose at least one thing you are seeing.','Elija al menos una cosa que esté viendo.'));return;}
+  const text=document.getElementById('fText').value.trim(),area=document.getElementById('fArea').value.trim();
+  if(/\d{3}[-.\s]?\d{3}[-.\s]?\d{4}/.test(text+area)){show('err',L('Please remove the phone number before submitting.','Por favor elimine el número de teléfono antes de enviar.'));return;}
+  if(!FORM_ENDPOINT){show('err',L('The reporting form is being set up. Please check back soon.','El formulario de reportes se está configurando. Vuelva pronto.'));return;}
+  if(document.getElementById('fHp').value){return;}
+  btn.disabled=true;
+  try{const res=await fetch(FORM_ENDPOINT,{method:'POST',headers:{'Accept':'application/json','Content-Type':'application/json'},body:JSON.stringify({county:document.getElementById('fCounty').value,area,types:types.join('; '),when:document.getElementById('fWhen').value,role:document.getElementById('fRole').value,text,language:lang,submittedAt:new Date().toISOString()})});
+   if(!res.ok)throw new Error('bad');
+   show('ok',L('Thank you. Your report was sent.','Gracias. Su reporte fue enviado.'));ev.target.reset();document.getElementById('fCounty').value=current;}
+  catch(e){show('err',L('Your report could not be sent. Check your connection and try again.','No se pudo enviar su reporte. Revise su conexión e intente de nuevo.'));}
+  finally{btn.disabled=false;}});
+}
+function renderReportSummary(){
+ const box=document.getElementById('reportSummary');box.replaceChildren();
+ box.append(el('p',{style:'margin:0'},L('Reports are reviewed privately. Individual descriptions are never published. Patterns across many reports may be summarized on this site in the future, always separate from the Census data.','Los reportes se revisan en privado. Las descripciones individuales nunca se publican. En el futuro, este sitio podría resumir patrones de muchos reportes, siempre separados de los datos del Censo.')));
+}
+const PAGES=['overview','map','rent','profile','compare','future','report','method'];
+function route(force){let p=force||(location.hash||'#overview').slice(1);if(!PAGES.includes(p))p='overview';
+ PAGES.forEach(id=>document.getElementById('page-'+id).classList.toggle('active',id===p));
+ document.querySelectorAll('nav.tabs a').forEach(a=>{if(a.getAttribute('href')==='#'+p)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+ document.getElementById('countybar').style.display=(p==='overview'||p==='method'||p==='report')?'none':'';hideTip();window.scrollTo(0,0);}
+function renderAll(){document.getElementById('countySel').value=current;document.getElementById('heroSel').value=current;renderOverview();renderHero();renderMap();renderRent();renderProfile();renderCost();renderCompare();renderFuture();}
+function setLang(l){lang=l;try{localStorage.setItem('lang',l)}catch(e){};applyStatic();renderAll();renderReportSummary();}
+document.getElementById('langBtn').addEventListener('click',()=>setLang(lang==='es'?'en':'es'));
+['countySel','heroSel'].forEach(id=>document.getElementById(id).addEventListener('change',e=>setCounty(e.target.value)));
+document.getElementById('mapMetric').addEventListener('change',e=>{mapMetric=e.target.value;renderMap();});
+document.getElementById('rankMetric').addEventListener('change',e=>{rankMetric=e.target.value;renderCompare();});
+document.getElementById('xMetric').addEventListener('change',e=>{xM=e.target.value;renderCompare();});
+document.getElementById('yMetric').addEventListener('change',e=>{yM=e.target.value;renderCompare();});
+window.addEventListener('hashchange',()=>route());window.addEventListener('popstate',()=>route());
+document.addEventListener('click',ev=>{const a=ev.target.closest('a[href^="#"]');if(!a)return;const p=a.getAttribute('href').slice(1);if(!PAGES.includes(p))return;ev.preventDefault();try{history.pushState(null,'','#'+p);}catch(e){}route(p);});
+applyStatic();setupForm();renderAll();renderReportSummary();route();
+</script>
+</body>
+</html>
